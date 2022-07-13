@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 overwrite_template_dir=0
 
+# TODO adapt script to API and app templates and then activate this in makefile
 while getopts t:o flag
 do
     case "${flag}" in

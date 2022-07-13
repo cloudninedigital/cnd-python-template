@@ -87,11 +87,12 @@ release:          ## Create a new tag for release.
 	@git push -u origin HEAD --tags
 	@echo "Github Actions will detect the new tag and release the new version."
 
-.PHONY: docs
-docs:             ## Build the documentation.
-	@echo "building documentation ..."
-	@$(ENV_PREFIX)mkdocs build
-	URL="site/index.html"; xdg-open $$URL || sensible-browser $$URL || x-www-browser $$URL || gnome-open $$URL
+# TODO adapt this to use sphinx
+# .PHONY: docs
+# docs:             ## Build the documentation.
+# 	@echo "building documentation ..."
+# 	@$(ENV_PREFIX)mkdocs build
+# 	URL="site/index.html"; xdg-open $$URL || sensible-browser $$URL || x-www-browser $$URL || gnome-open $$URL
 
 .PHONY: switch-to-poetry
 switch-to-poetry: ## Switch to poetry package manager.
@@ -111,12 +112,10 @@ switch-to-poetry: ## Switch to poetry package manager.
 	@echo "You have switched to https://python-poetry.org/ package manager."
 	@echo "Please run 'poetry shell' or 'poetry run project_name'"
 
-.PHONY: init
-init:             ## Initialize the project based on an application template.
-	@./.github/init.sh
+# TODO add this back when init.sh has been adapted. For now it is not needed
+#.PHONY: init
+#init:             ## Initialize the project based on an application template.
+#	@./.github/init.sh
 
 
 # This project has been generated from cloudninedigital/cnd-python-template
-# __author__ = 'cloudninedigital'
-# __repo__ = https://github.com/cloudninedigital/cnd-python-template
-# __sponsor__ = https://github.com/sponsors/cloudninedigital/

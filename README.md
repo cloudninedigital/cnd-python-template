@@ -1,25 +1,20 @@
 
 # Python Project Template
 
-A low dependency and really simple to start project template for Python Projects.
-
-See also 
-- [Flask-Project-Template](https://github.com/cloudninedigital/flask-project-template/) for a full feature Flask project including database, API, admin interface, etc.
-- [FastAPI-Project-Template](https://github.com/cloudninedigital/fastapi-project-template/) The base to start an openapi project featuring: SQLModel, Typer, FastAPI, JWT Token Auth, Interactive Shell, Management Commands.
+A small python project structure for projects that do not need many dependencies.
 
 ### HOW TO USE THIS TEMPLATE
 
 > **DO NOT FORK** this is meant to be used from **[Use this template](https://github.com/cloudninedigital/cnd-python-template/generate)** feature.
 
 1. Click on **[Use this template](https://github.com/cloudninedigital/cnd-python-template/generate)**
-3. Give a name to your project  
-   (e.g. `my_awesome_project` recommendation is to use all lowercase and underscores separation for repo names.)
+2. Give a name to your project. See [naming conventions](https://github.com/cloudninedigital)
 3. Wait until the first run of CI finishes  
    (Github Actions will process the template and commit to your new repo)
-4. If you want [codecov](https://about.codecov.io/sign-up/) Reports and Automatic Release to [PyPI](https://pypi.org)  
+4. If you want [codecov](https://about.codecov.io/sign-up/) Reports and Automatic Release to <insert Cloud Nine Digital repo here>  
   On the new repository `settings->secrets` add your `PIPY_API_TOKEN` and `CODECOV_TOKEN` (get the tokens on respective websites)
-4. Read the file [CONTRIBUTING.md](CONTRIBUTING.md)
-5. Then clone your new project and happy coding!
+5. Read the file [CONTRIBUTING.md](CONTRIBUTING.md)
+6. Then clone your new project and happy coding!
 
 > **NOTE**: **WAIT** until first CI run on github actions before cloning your new project.
 
