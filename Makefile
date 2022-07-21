@@ -74,6 +74,11 @@ virtualenv:       ## Create a virtual environment.
 	@echo
 	@echo "!!! Please run 'source .venv/bin/activate' to enable the environment !!!"
 
+
+.PHONY: init-venv
+init-venv:       ## Initialize configuration virtual environment.
+	@./.github/init_venv.sh
+
 .PHONY: release
 release:          ## Create a new tag for release.
 	@echo "WARNING: This operation will create s version tag and push to github"
