@@ -118,4 +118,4 @@ switch-to-poetry: ## Switch to poetry package manager.
 #	@./.github/init.sh
 
 
-# This project has been generated from cloudninedigital/cnd-python-template
+# This project has been generated from cloudninedigital/cnd-etl-template

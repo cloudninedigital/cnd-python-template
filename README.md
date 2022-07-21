@@ -1,13 +1,12 @@
-
-# Python Project Template
+# Python Project Template for APIs
 
 A small python project structure for projects that do not need many dependencies.
 
 ### HOW TO USE THIS TEMPLATE
 
-> **DO NOT FORK** this is meant to be used from **[Use this template](https://github.com/cloudninedigital/cnd-python-template/generate)** feature.
+> **DO NOT FORK** this is meant to be used from **[Use this template](https://github.com/cloudninedigital/cnd-etl-template/generate)** feature.
 
-1. Click on **[Use this template](https://github.com/cloudninedigital/cnd-python-template/generate)**
+1. Click on **[Use this template](https://github.com/cloudninedigital/cnd-etl-template/generate)**
 2. Give a name to your project. See [naming conventions](https://github.com/cloudninedigital)
 3. Wait until the first run of CI finishes  
    (Github Actions will process the template and commit to your new repo)
@@ -21,7 +20,7 @@ A small python project structure for projects that do not need many dependencies
 ### What is included on this template?
 
 - 🖼️ Templates for starting multiple application types:
-  * **Basic low dependency** Python program (default) [use this template](https://github.com/cloudninedigital/cnd-python-template/generate)
+  * **Basic low dependency** Python program (default) [use this template](https://github.com/cloudninedigital/cnd-etl-template/generate)
   * **Flask** with database, admin interface, restapi and authentication [use this template](https://github.com/cloudninedigital/flask-project-template/generate).
   **or Run `make init` after cloning to generate a new project based on a template.**
 - 📦 A basic [setup.py](setup.py) file to provide installation, packaging and distribution for your project.  
@@ -39,7 +38,7 @@ A small python project structure for projects that do not need many dependencies
 - 🔄 Continuous integration using [Github Actions](.github/workflows/) with jobs to lint, test and release your project on Linux, Mac and Windows environments.
 
 > Curious about architectural decisions on this template? read [ABOUT_THIS_TEMPLATE.md](ABOUT_THIS_TEMPLATE.md)  
-> If you want to contribute to this template please open an [issue](https://github.com/cloudninedigital/cnd-python-template/issues) or fork and send a PULL REQUEST.
+> If you want to contribute to this template please open an [issue](https://github.com/cloudninedigital/cnd-etl-template/issues) or fork and send a PULL REQUEST.
 
 [❤️ Sponsor this project](https://github.com/sponsors/cloudninedigital/)
 
