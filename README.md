@@ -77,3 +77,8 @@ $ project_name
 ## Development
 
 Read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+
+# GitHub Actions
+
+[Authentication of Google Cloud in GitHub Actions](https://github.com/marketplace/actions/authenticate-to-google-cloud).
