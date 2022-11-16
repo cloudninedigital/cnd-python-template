@@ -133,3 +133,9 @@ dmypy.json
 
 # PyCharm
 .idea/
+
+# Attempt at avoiding credentials
+credentials.json
+cred.json
+creds.json
+credentials
