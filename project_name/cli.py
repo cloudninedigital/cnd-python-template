@@ -1,18 +1,6 @@
-"""CLI interface for project_name project.
-
-Be creative! do whatever you want!
-
-- Install click or typer and create a CLI app
-- Use builtin argparse
-- Start a web application
-- Import things from your .base module
-"""
-
-
 def main():  # pragma: no cover
     """
-    The main function executes on commands:
-    `python -m project_name` and `$ project_name `.
+    This function needs to be implemented when we are testing locally
 
     This is your program's entry point.
 
