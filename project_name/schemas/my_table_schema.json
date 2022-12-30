@@ -1,0 +1,44 @@
+[
+  {
+    "name": "date",
+    "type": "DATE",
+    "mode": "REQUIRED",
+    "description": "Date in which order was finalized."
+  },
+  {
+    "name": "brand",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Brand in which purchase was made."
+  },
+  {
+    "name": "order_id",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "Purchase ID."
+  },
+  {
+    "name": "revenue",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "Amount associated with purchase."
+  },
+  {
+    "name": "order_qty",
+    "type": "INTEGER",
+    "mode": "REQUIRED",
+    "description": "Quantity of items of the order."
+  },
+  {
+    "name": "user_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "ID of user if available."
+  },
+  {
+    "name": "upload_date",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE",
+    "description": "Time an order recorded was uploaded to this table."
+  }
+]
