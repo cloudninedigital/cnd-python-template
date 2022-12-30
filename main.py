@@ -1,0 +1,1 @@
+from project_name.gcp import main_http_event, main_cloud_event
