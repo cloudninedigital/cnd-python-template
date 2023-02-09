@@ -4,7 +4,7 @@ A repository that serves as a template for deploying small pipelines and
 Cloud Functions in GCP.
 
 This template uses Python for implementing all the logic deployed in your GCP 
-Functions and Terraform as a deployment technique.
+Functions and Terraform as a deployment system.
 
 
 # How use the ETL template
@@ -93,7 +93,43 @@ See below for a few more details on both parts:
 ### Python code
 To start development, you will have to understand which service in Google Cloud is your code
 going to be deployed. To see how you can start coding your entry points, check the relevant folders:
-* For Cloud Functions, please see ...
+* For Cloud Functions, please the following entrypoints in `project_name/gcp.py`
+  * `main_cloud_event` meant to be used for file events on Google Cloud Storage.
+  * `main_http_event` meant to be used for http triggers
+  * `main_pubsub` meant to be used for Pub/Sub triggers
+
+In order to configure the triggers for Cloud Functions, please see the section on the [Terraform configuration](#terraform-configuration)
+section.
+
+> :exclamation: For now there are not pre-made templates for Cloud Run or other services in Google Cloud. This guide is supposed to be
+expanded with more examples as we go forward and explore more Cloud services for ETL/ELT processes.
+
+### Making CND internal dependencies installable
+For being able to deploy your code using internal dependencies from CND, we need to enable the Google Cloud Project
+that you are working on to be able to install these packages. At the time of writing, the only package that is provided
+internally is [cnd-tools](https://github.com/cloudninedigital/cnd-tools). You will notice that the file `requirements.txt`
+is already configured with the [CND Artifact Registry for python packages](https://console.cloud.google.com/artifacts/python/cloudnine-digital/europe-west4/cnd-tools-repo?project=cloudnine-digital).
+
+This is however, not sufficient, as you are working in a different project than the one where the repository is located.
+For this to work, the Cloud Build service account of your project needs to be given role **Artifact Registry Reader** 
+role in the original project hosting the python package registry: 
+* Go to the project [cloudnine-digital](https://console.cloud.google.com/home/dashboard?project=cloudnine-digital).
+* Navigate to **IAM**
+* Click **Grant Access**
+* Add the Cloud Build service account _of your client project_ as a new principal. The Cloud Build default service 
+account is `PROJECT_NUMBER-compute@developer.gserviceaccount.com`. Note that here we use the _project number as opposed 
+to the project ID_. This project number belongs to the project you are deploying this current project to.
+* Give it **Artifact Registry Reader** role.
+
+See relevant documentation [here](https://cloud.google.com/artifact-registry/docs/integrate-functions).
+
+> **Note for template developers** As we advance further, this IAM management should move to a `cloudnine-digital`
+> project specific terraform.
+
+
+> **Note for users** For reasons not known at the moment of writing, installing `cnd_tools` with a runtime environment `python311`
+> is not functional due to an incompatibility between the `pandas` library and Cloud Build engine. Please use `python310`
+> for now.
 
 ### Terraform configuration
 
@@ -101,12 +137,12 @@ There a few examples of deployments of Cloud Functions present in the folder
 `terraform/main_examples`. From one of these files, you can copy the contents and paste it onto your `terraform/main.tf`.
 
 This will provide you with a starting point for the configuration you are trying to achieve. Please read the documentation of 
-each one of these modules before you use them, so as to avoid surprises in your development process.
+each one of these modules before you use them, to avoid surprises in your development process.
 
 To extend your Terraform configuration, you will have to start dwelling into un-templated territory :relaxed:.
 Please follow a few [Getting Started with Google Cloud in Terraform](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started)
-tutorials so as to get acquainted with the system.
+tutorials to get acquainted with the system.
 
-## 6. Implement your Python code
+
 
 
