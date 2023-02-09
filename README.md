@@ -117,7 +117,7 @@ role in the original project hosting the python package registry:
 * Navigate to **IAM**
 * Click **Grant Access**
 * Add the Cloud Build service account _of your client project_ as a new principal. The Cloud Build default service 
-account is `PROJECT_NUMBER-compute@developer.gserviceaccount.com`. Note that here we use the _project number as opposed 
+account is `PROJECT_NUMBER@cloudbuild.gserviceaccount.com`. Note that here we use the _project number as opposed 
 to the project ID_. This project number belongs to the project you are deploying this current project to.
 * Give it **Artifact Registry Reader** role.
 
