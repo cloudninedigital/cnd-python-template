@@ -4,7 +4,7 @@
 
 module "cgf_bigquery" {
   source = "./modules/gf_gen2_bigquery_trigger_source_repo"
-  name = "name_of_cloud_function"
+  name = var.application_name
   description = <<EOF
   This function will trigger when a bigquery table create or delete has happened
 EOF
@@ -13,11 +13,11 @@ EOF
   project = var.project
   entry_point = "main_bigquery_event"
   environment = {
-    project = var.project
-    include_variables = "false"
-    show_all_rows = "false"
-    on_error_continue = "false"
-    exclude_temp_ids = "false"
+    PROJECT=var.project
+    INCLUDE_VARIABLES="false"
+    SHOW_ALL_ROWS="false"
+    ON_ERROR_CONTINUE="false"
+    EXCLUDE_TEMP_IDS="false"
   }
 }
 

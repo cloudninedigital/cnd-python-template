@@ -35,12 +35,12 @@ class BigQueryScriptExecutor:
     """
     def __init__(self, project: str = None, script_file_location: str = None, credentials = None,
                  show_all_rows: bool =False, on_error_continue: bool =False, exclude_temp_ids: bool =False, include_variables: bool =False):
-        self.project = project or os.environ.get('project')
-        self.script_file_location = script_file_location or os.environ.get('script_file_location')
-        self.show_all_rows = show_all_rows or os.getenv('script_file_location', '').lower() == 'true'
-        self.on_error_continue = on_error_continue or os.getenv('on_error_continue', '').lower() == 'true'
-        self.exclude_temp_ids = exclude_temp_ids or os.getenv('exclude_temp_ids', '').lower() == 'true'
-        self.include_variables = include_variables or os.getenv('include_variables', '').lower() == 'true'
+        self.project = project or os.environ.get('PROJECT')
+        self.script_file_location = script_file_location or os.environ.get('SCRIPT_FILE_LOCATION')
+        self.show_all_rows = show_all_rows or os.getenv('SHOW_ALL_ROWS', '').lower() == 'true'
+        self.on_error_continue = on_error_continue or os.getenv('ON_ERROR_CONTINUE', '').lower() == 'true'
+        self.exclude_temp_ids = exclude_temp_ids or os.getenv('EXCLUDE_TEMP_IDS', '').lower() == 'true'
+        self.include_variables = include_variables or os.getenv('INCLUDE_VARIABLES', '').lower() == 'true'
         self.variables = {}
         self._authenticate(project, credentials)
 

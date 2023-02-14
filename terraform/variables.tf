@@ -1,3 +1,9 @@
+variable "application_name" {
+  description = "Name of application"
+  type = string
+  default = "bq-executor"
+}
+
 variable "project" {
   description = "Project ID"
   type        = string
@@ -22,11 +28,11 @@ variable "functions_region" {
 
 variable "source_repo_name" {
   description = "Name of the repository holding the source code in Cloud Source."
-  default = "github_denniscnd_bq-executor-cnd-etl-template"
+  default = "github_denniscnd_dennistest"
 }
 
 variable "source_repo_branch" {
   description = "Branch name containing code to be deployed."
   type = string
-  default = "main"
+  default = "feature-bq-executor"
 }
