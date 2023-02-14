@@ -5,6 +5,7 @@ module "cgf_pubsub" {
   This function will trigger when a new pubsub message is published.
 EOF
   source_repo_name = var.source_repo_name
+  source_repo_branch = var.source_repo_branch
   project = var.project
   trigger_resource = google_storage_bucket.landing_bucket.name
   entry_point = "main_cloud_event"
