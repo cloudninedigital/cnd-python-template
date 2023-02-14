@@ -22,5 +22,11 @@ variable "functions_region" {
 
 variable "source_repo_name" {
   description = "Name of the repository holding the source code in Cloud Source."
-  default = "project_repo_name_on_cloud_source" #This should not be the name of the repo in GitHub
+  default = "github_denniscnd_bq-executor-cnd-etl-template"
+}
+
+variable "source_repo_branch" {
+  description = "Branch name containing code to be deployed."
+  type = string
+  default = "main"
 }

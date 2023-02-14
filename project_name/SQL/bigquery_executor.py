@@ -68,7 +68,7 @@ class BigQueryScriptExecutor:
             query_with_temp_id = query.replace("temp.", f"temp.{temp_id}")
             for var in self.variables.keys():
                 query_with_temp_id = query_with_temp_id.replace(f"$${var}$$", self.variables[var])
-            logging.info(f"executing query {queries.index(query) + 1}: {query_temp_id}")
+            logging.info(f"executing query {queries.index(query) + 1}: {query_with_temp_id}")
             query_job = self.client.query(
                 (query_with_temp_id),
                 project=self.project
@@ -91,7 +91,7 @@ class BigQueryScriptExecutor:
 
             #TODO: Check for distinction in Exceptions between python script errors vs API error
             except Exception as e:
-                logging.warn(f"exception: {e} \nin query: {query_temp_id}")
+                logging.warn(f"exception: {e} \nin query: {query_with_temp_id}")
                 if not self.on_error_continue:
                     raise Exception(e)
 
