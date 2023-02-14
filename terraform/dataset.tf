@@ -22,12 +22,12 @@ resource "google_bigquery_table" "orders_table" {
 }
 
 resource "google_bigquery_table" "purchase_variants" {
-  dataset_id = google_bigquery_dataset.pvh_returns_automation.dataset_id
+  dataset_id = google_bigquery_dataset.my_dataset.dataset_id
   table_id   = "purchase_variants"
 
   time_partitioning {
     type = "DAY"
   }
 
-  schema = file("${path.module}/../ext_pvh_returns_automation/schemas/purchase_variants_schema.json")
+  # schema = file("${path.module}/../ext_pvh_returns_automation/schemas/purchase_variants_schema.json")
 }

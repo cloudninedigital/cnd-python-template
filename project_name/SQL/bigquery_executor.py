@@ -6,6 +6,7 @@ import random
 import json
 import re
 import logging
+import uuid
 
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', encoding='utf-8', level=logging.INFO)
@@ -20,7 +21,7 @@ class BigQueryScriptExecutor:
         * show_all_rows: boolean, default=False. determines if select queries (so not create/update statements) should yield all results. By default you'll only see the first 10 rows of the select query. 
         * on_error_continue: boolean, default=False. determines if the script should continue after an error has occured in one of the queries. 
         * exclude_temp_ids: boolean, default=False. Determines if the addition of a random_id to tables created in dataset 'temp' should be added or not. These temp_ids are added to avoid collision of commonly named temp tables that might run at the same time (such as temp.products for example). 
-        * include_variables: boolean, defualt=False. Determines if the variable set functionality needs to be used or not. if True, variables can be set by adding a select query formatted like: '--set_variable--example_variable_name--set_variable-- select value from example.table' and can used in queries like 'select '$$example_variable_name$$'
+        * include_variables: boolean, defualt=False. Determines if the variable set functionality needs to be used or not. if True, variables can be set by adding a select query formatted like: '--set_variable--example_variable_name--set_variable--\n select value from example.table' and can used in queries like 'select '$$example_variable_name$$'
     
 
         example usage:
@@ -30,7 +31,7 @@ class BigQueryScriptExecutor:
         python3 bigquery-executor.py --project="cloudnine-digital" \
         --script_file_location="./sql-scripts/example.sql"
 
-        More extensive argument options are shown in the main function (mostly same as class options, with the exception that a )
+        More extensive argument options are shown in the main function (mostly same as class options, with the exception that a service_account_credentials_file can be included here)
     """
     def __init__(self, project: str = None, script_file_location: str = None, credentials = None,
                  show_all_rows: bool =False, on_error_continue: bool =False, exclude_temp_ids: bool =False, include_variables: bool =False):
@@ -51,24 +52,25 @@ class BigQueryScriptExecutor:
 
     def execute_script_file(self):
         limit = 10
-        temp_id = random.randint(1, 100000)
+        temp_id = uuid.uuid4().hex
         if self.exclude_temp_ids:
             temp_id = ""
 
-        with open(self.script_file_location, encoding="ISO-8859-1") as file:
-            queries = re.split(r'\;(?!\-\-donotsplit)',file.read())
+        #TODO: check if we need the encoding?
+        with open(self.script_file_location, encoding="ISO-8859-1") as f:
+            queries = re.split(r'\;(?!\-\-donotsplit)',f.read())
 
         for query in queries:
             if query.strip() == "":
                 logging.info(f"query {queries.index(query) + 1} of {len(queries)} is empty")
                 continue
 
-            query_temp_id = query.replace("temp.", f"temp.{temp_id}")
+            query_with_temp_id = query.replace("temp.", f"temp.{temp_id}")
             for var in self.variables.keys():
-                query_temp_id = query_temp_id.replace(f"$${var}$$", self.variables[var])
+                query_with_temp_id = query_with_temp_id.replace(f"$${var}$$", self.variables[var])
             logging.info(f"executing query {queries.index(query) + 1}: {query_temp_id}")
             query_job = self.client.query(
-                (query_temp_id),
+                (query_with_temp_id),
                 project=self.project
             )
             try:
@@ -87,6 +89,7 @@ class BigQueryScriptExecutor:
                     varname = query.strip().split("--set_variable--")[1]
                     self.variables[varname] = row[0]
 
+            #TODO: Check for distinction in Exceptions between python script errors vs API error
             except Exception as e:
                 logging.warn(f"exception: {e} \nin query: {query_temp_id}")
                 if not self.on_error_continue:
@@ -106,7 +109,7 @@ def main():
     parser.add_argument('--include_variables', type=bool, required=False, default=False)
     parser.add_argument('--service_account_credentials_file', type=str, required=False, default=None)
     credentials = None
-    flags, _ = parser.parse_known_args()
+    flags, _ = parser.parse_args()
 
     if flags.service_account_credentials_file is not None:
         with open(flags.service_account_credentials_file, 'r') as _file:
