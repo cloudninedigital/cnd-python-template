@@ -20,14 +20,3 @@ resource "google_bigquery_table" "orders_table" {
 
   schema = file("${path.module}/../project_name/schemas/my_table_schema.json")
 }
-
-resource "google_bigquery_table" "purchase_variants" {
-  dataset_id = google_bigquery_dataset.my_dataset.dataset_id
-  table_id   = "purchase_variants"
-
-  time_partitioning {
-    type = "DAY"
-  }
-
-  # schema = file("${path.module}/../ext_pvh_returns_automation/schemas/purchase_variants_schema.json")
-}
