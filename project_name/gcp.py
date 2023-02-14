@@ -45,10 +45,9 @@ def main_pubsub(cloud_event):
 def main_bigquery_event(cloud_event):
 
     data = cloud_event.data
-    bucket = data["bucket"]
-    file_name = data["name"]
-    print(f"Bucket: {bucket}")
-    print(f"File: {file_name}")
+    print(data)
+    # table = data["table"]
+    # print(f"Table: {table}")
 
     # Implement processing of file here
     file_path = f"gs://{bucket}/{file_name}"
