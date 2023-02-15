@@ -47,7 +47,7 @@ def main_bigquery_event(cloud_event):
     data = cloud_event.data
     print(data)
 
-    if not 'metadata' in data['protoPayload']
+    if not 'metadata' in data['protoPayload'] or \
     not 'tableDataChange' in data['protoPayload']['metadata'].keys() or \
      not 'insertedRowsCount' in data['protoPayload']['metadata']['tableDataChange'].keys() or \
      int(data['protoPayload']['metadata']['tableDataChange']['insertedRowsCount']) < 1:
