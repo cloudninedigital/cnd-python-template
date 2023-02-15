@@ -1,6 +1,6 @@
 import functions_framework
 import re
-from project_name.base import export_bucket_file_to_bq, refresh_data_from_api
+from project_name.base import export_bucket_file_to_bq, refresh_data_from_api, execute_query_script
 
 
 @functions_framework.cloud_event
