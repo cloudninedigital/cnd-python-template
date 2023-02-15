@@ -47,9 +47,10 @@ def main_bigquery_event(cloud_event):
     data = cloud_event.data
     print(data)
 
-    if not 'tableDataChange' in data['metadata'].keys() or \
-     not 'insertedRowsCount' in data['metadata']['tableDataChange'].keys() or \
-     int(data['metadata']['tableDataChange']['insertedRowsCount']) < 1:
+    if not 'metadata' in data['protoPayload']
+    not 'tableDataChange' in data['protoPayload']['metadata'].keys() or \
+     not 'insertedRowsCount' in data['protoPayload']['metadata']['tableDataChange'].keys() or \
+     int(data['protoPayload']['metadata']['tableDataChange']['insertedRowsCount']) < 1:
         return
 
     # this seems unsafe but the function wouldn't have triggered if this pattern did not exist
