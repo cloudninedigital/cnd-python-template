@@ -55,8 +55,8 @@ def main_bigquery_event(cloud_event):
         return
 
     # this seems unsafe but the function wouldn't have triggered if this pattern did not exist
-    dataset = re.search('datasets\/(.*)\/tables', data['resourceName'])[1]
-    table = re.search('/tables/(.*)', data['resourceName'])[1]
+    dataset = re.search('datasets\/(.*)\/tables', data['protoPayload']['resourceName'])[1]
+    table = re.search('/tables/(.*)', data['protoPayload']['resourceName'])[1]
     print((dataset, table))
     # Implement processing of file here
     execute_query_script(f'{dataset}.{table}')
