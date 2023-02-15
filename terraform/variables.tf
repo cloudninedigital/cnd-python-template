@@ -28,11 +28,11 @@ variable "functions_region" {
 
 variable "source_repo_name" {
   description = "Name of the repository holding the source code in Cloud Source."
-  default = "github_denniscnd_dennistest"
+  default = "github_cloudninedigital_cnd-etl-template"
 }
 
 variable "source_repo_branch" {
   description = "Branch name containing code to be deployed."
   type = string
-  default = "feature-bq-executor"
+  default = "main"
 }
