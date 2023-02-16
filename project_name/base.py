@@ -17,4 +17,4 @@ def execute_query_script(table):
         table_script_lookup = json.load(_file)
     for sfl in table_script_lookup[table]:        
         bq = BigQueryScriptExecutor(script_file_location=sfl)
-        bq.execute_query_script()
+        bq.execute_script_file()
