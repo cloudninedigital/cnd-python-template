@@ -1,2 +1,2 @@
-{"dataset.table_id_1": ["SQL/sql_scripts/example.sql"],
-"some_dataset.ietsz": ["SQL/sql_scripts/example.sql","SQL/sql_scripts/example2.sql"]}
+{"dataset.table_id_1": ["./project_name/SQL/sql_scripts/example.sql"],
+"some_dataset.ietsz": ["./project_name/SQL/sql_scripts/example.sql","./project_name/SQL/sql_scripts/example2.sql"]}

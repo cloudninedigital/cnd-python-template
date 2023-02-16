@@ -13,7 +13,7 @@ def refresh_data_from_api(*args, **kwargs):
 
 
 def execute_query_script(table):
-    with open('SQL/table_script_lookup.json') as _file:
+    with open('./project_name/SQL/table_script_lookup.json') as _file:
         table_script_lookup = json.load(_file)
     for sfl in table_script_lookup[table]:        
         bq = BigQueryScriptExecutor(script_file_location=sfl)
