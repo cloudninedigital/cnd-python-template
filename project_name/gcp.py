@@ -1,10 +1,10 @@
 import functions_framework
 import re
-from project_name.base import export_bucket_file_to_bq, refresh_data_from_api, execute_query_script
+from project_name.base import export_bucket_file_to_bq, refresh_data, execute_query_script
 
 
 @functions_framework.cloud_event
-def main_cloud_event(cloud_event):
+def main_gcs_event(cloud_event):
     data = cloud_event.data
     bucket = data["bucket"]
     file_name = data["name"]
@@ -19,7 +19,7 @@ def main_cloud_event(cloud_event):
 @functions_framework.http
 def main_http_event(request):
     try:
-        refresh_data_from_api()
+        refresh_data()
     except Exception:
         # TODO Improve error reporting
         return "Processing was unsuccessful", 500
@@ -37,7 +37,7 @@ def main_pubsub(cloud_event):
 
     json_config = json.loads(config)
     # We let any exception through
-    refresh_data_from_api(**json_config)
+    refresh_data(**json_config)
 
     return "Processing was successful"
 
