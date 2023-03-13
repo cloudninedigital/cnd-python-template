@@ -1,1 +1,1 @@
-from project_name.gcp import main_http_event, main_cloud_event, main_bigquery_event
+from project_name.gcp import main_http_event, main_gcs_event, main_bigquery_event

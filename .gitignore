@@ -179,8 +179,4 @@ override.tf.json
 terraform.rc
 
 # Data
-<<<<<<< HEAD
 data/
-=======
-data/
->>>>>>> b0ce1f9 (Update gitignore to ignore some Terraform files)
