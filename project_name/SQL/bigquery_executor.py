@@ -15,8 +15,13 @@ class BigQueryScriptExecutor:
     """class to execute bigquery scripts. 
 
         Class Arguments: 
+<<<<<<< Updated upstream
         * project: string, required. project in which to make the query statements.
         * script_file_location: string, required. The location where the script that is to be executed resides.
+=======
+        * project: string, optional. project in which to make the query statements.
+        * script_file_location: string, optional. The location where the script that is to be executed resides.
+>>>>>>> Stashed changes
         * credentials: google oauth2 Credentials object, optional. Use this if you want to authenticate with your own credentials object. By default the class uses the 'GOOGLE_APPLICATION_CREDENTIALS' environment variable or a standard login created by `gcloud auth application-default login`. This default is a standard from google cloud.
         * show_all_rows: boolean, default=False. determines if select queries (so not create/update statements) should yield all results. By default you'll only see the first 10 rows of the select query. 
         * on_error_continue: boolean, default=False. determines if the script should continue after an error has occured in one of the queries. 
@@ -34,13 +39,22 @@ class BigQueryScriptExecutor:
         More extensive argument options are shown in the main function (mostly same as class options, with the exception that a service_account_credentials_file can be included here)
     """
     def __init__(self, project: str = None, script_file_location: str = None, credentials = None,
+<<<<<<< Updated upstream
                  show_all_rows: bool =False, on_error_continue: bool =False, exclude_temp_ids: bool =False, include_variables: bool =False):
+=======
+                 show_all_rows: bool =False, on_error_continue: bool =False, exclude_temp_ids: bool =False,
+                  include_variables: bool =False, table: str = None):
+>>>>>>> Stashed changes
         self.project = project or os.environ.get('PROJECT')
         self.script_file_location = script_file_location or os.environ.get('SCRIPT_FILE_LOCATION')
         self.show_all_rows = show_all_rows or os.getenv('SHOW_ALL_ROWS', '').lower() == 'true'
         self.on_error_continue = on_error_continue or os.getenv('ON_ERROR_CONTINUE', '').lower() == 'true'
         self.exclude_temp_ids = exclude_temp_ids or os.getenv('EXCLUDE_TEMP_IDS', '').lower() == 'true'
         self.include_variables = include_variables or os.getenv('INCLUDE_VARIABLES', '').lower() == 'true'
+<<<<<<< Updated upstream
+=======
+        self.table = table or os.environ.get('TABLE')
+>>>>>>> Stashed changes
         self.variables = {}
         self._authenticate(project, credentials)
 
@@ -64,6 +78,12 @@ class BigQueryScriptExecutor:
             if query.strip() == "":
                 logging.info(f"query {queries.index(query) + 1} of {len(queries)} is empty")
                 continue
+<<<<<<< Updated upstream
+=======
+            
+            if self.table:
+                query = query.replace("$$table$$", self.table)
+>>>>>>> Stashed changes
 
             query_with_temp_id = query.replace("temp.", f"temp.{temp_id}")
             for var in self.variables.keys():
