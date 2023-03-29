@@ -7,3 +7,4 @@ google-cloud-logging
 google-cloud-bigquery
 python-dotenv
 openpyxl
+cnd-tools[gcp]
