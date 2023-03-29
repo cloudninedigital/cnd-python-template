@@ -15,7 +15,7 @@ def execute_query_script(table):
     ##TODO: create fallback for unrecognized tables.
     for k in table_script_lookup.keys():
         if not k in table:        
-            return
+            continue
         for sfl in table_script_lookup[k]:
             bq = BigQueryScriptExecutor(script_file_location=sfl, table=table)
             bq.execute_script_file()
