@@ -60,15 +60,15 @@ class BigQueryScriptExecutor:
 
         #TODO: check if we need the encoding?
         with open(self.script_file_location, encoding="ISO-8859-1") as f:
-            queries = re.split(r'\;(?!\-\-donotsplit)',f.read())
+            file_string = f.read()
+            if self.table:
+                file_string = file_string.replace("$$table$$", self.table)
+            queries = re.split(r'\;(?!\-\-donotsplit)',file_string)
 
         for query in queries:
             if query.strip() == "":
                 logging.info(f"query {queries.index(query) + 1} of {len(queries)} is empty")
                 continue
-            
-            if self.table:
-                query = query.replace("$$table$$", self.table)
 
             query_with_temp_id = query.replace("temp.", f"temp.{temp_id}")
             for var in self.variables.keys():
