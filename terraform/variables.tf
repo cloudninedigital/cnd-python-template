@@ -34,3 +34,9 @@ variable "source_repo_branch" {
   type = string
   default = "main"
 }
+
+variable "bucket" {
+  description = "bucket name."
+  type = string
+  default=""
+}

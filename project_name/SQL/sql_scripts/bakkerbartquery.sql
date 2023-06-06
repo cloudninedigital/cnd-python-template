@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS `Magento.test_table`;
