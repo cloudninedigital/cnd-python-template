@@ -19,5 +19,5 @@ def execute_query_script(table):
         for sfl in table_script_lookup[k]:
             path = "/".join(sfl.split("/")[:-1])
             gcs.download_file(sfl, f'./{path}')
-            bq = BigQueryScriptExecutor(script_file_location=f'./{path}', table=table)
+            bq = BigQueryScriptExecutor(script_file_location=f'./{sfl}', table=table)
             bq.execute_script_file()

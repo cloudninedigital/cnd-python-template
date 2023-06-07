@@ -1,3 +1,3 @@
-{"dataset.table_id_1": ["./project_name/SQL/sql_scripts/example.sql"],
-"some_dataset.ietsz": ["./project_name/SQL/sql_scripts/example.sql","./project_name/SQL/sql_scripts/example2.sql"],
-"analytics_223334187.events_": ["./project_name/SQL/sql_scripts/ga4_count_events.sql"]}
+{"dataset.table_id_1": ["example.sql"],
+"some_dataset.ietsz": ["example.sql","example2.sql"],
+"analytics_223334187.events_": ["ga4_count_events.sql"]}

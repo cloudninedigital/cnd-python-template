@@ -1,3 +1,3 @@
-application_name = "pleasechangethisname"
-project="cloudnine-digital"
-
+application_name = "<changethisname>"
+project="<changethisvalue>"
+bucket="<changethisvalue>"
