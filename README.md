@@ -132,6 +132,8 @@ See relevant documentation [here](https://cloud.google.com/artifact-registry/doc
 
 
 ## 5.2 Link GitHub repo into a Google Cloud Source repo
+
+### CAUTION: THIS PART HAS PROBABLY BECOME IRRELEVANT DUE TO AUTOMATED DEPLOYMENTS!
 This step is necessary before you can deploy any Cloud Functions to GCP.
 The Cloud Function configurations in our ETL template are set to use a source repository as a code source.
 
