@@ -183,7 +183,6 @@ wq!
 ## 5.3b Enable automated deployment on Gitlab
 
 For Gitlab, the below steps can be followed:
-For Github, the below steps can be followed:
 
 1. In your GCP project console, create a new service account (named something along the lines of terraform-gitlab-executor)
 2. Provide this service account with the basic role 'Editor', and the 'Security Admin' role. 
