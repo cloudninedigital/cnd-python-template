@@ -133,7 +133,7 @@ See relevant documentation [here](https://cloud.google.com/artifact-registry/doc
 
 ## 5.2 Link GitHub repo into a Google Cloud Source repo
 
-### CAUTION: THIS PART HAS PROBABLY BECOME IRRELEVANT DUE TO AUTOMATED DEPLOYMENTS!
+### CAUTION: THIS PART HAS PROBABLY BECOME IRRELEVANT DUE TO AUTOMATED DEPLOYMENTS and usage of the GCP ZIP archive option for cloud functions!
 This step is necessary before you can deploy any Cloud Functions to GCP.
 The Cloud Function configurations in our ETL template are set to use a source repository as a code source.
 
@@ -153,7 +153,61 @@ Please take the following steps:
 > **Note**: This process is relevant for 1st gen Cloud Build repositories. Soon the CND developers
 > will automate the connection of 2nd gen Cloud Build repositories, rendering the step 5.3 obsolete.
 
-### 5.3 Terraform configuration
+## 5.3a Enable automated deployment on Github
+
+For Github, the below steps can be followed:
+
+1. In your GCP project console, create a new service account (named something along the lines of terraform-github-executor)
+2. Provide this service account with the basic role 'Editor', and the 'Security Admin' role. 
+3. When the account is created, Create and download a key file to your local laptop
+4. with a bash shell on your local laptop, do the following to remove line endings from the file: 
+``` bash
+vi gcp-keyfile.json
+# press :
+
+# Add the following 
+%s;\n; ;g
+# Press enter.
+
+# press : again
+
+# Execute the below command to save and close the editor
+wq!
+```
+5. On Github, in your repository, go to Settings → Secrets → New Secret, and create a secret named GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. 
+6. In your local repository, go to .github/workflows/terraform.yml and uncomment the whole script ( CTRL+A and CTRL+/)
+7. Make sure your variables are all added as intended in production.tfvars 
+8. Push your changes. You will notice that on a separate branch the pipeline will only run untill 'terraform plan'. The 'terraform apply', and thus the actual deployment will only be done when merging / pushing to the 'main' branch. 
+
+
+## 5.3b Enable automated deployment on Gitlab
+
+For Gitlab, the below steps can be followed:
+For Github, the below steps can be followed:
+
+1. In your GCP project console, create a new service account (named something along the lines of terraform-gitlab-executor)
+2. Provide this service account with the basic role 'Editor', and the 'Security Admin' role. 
+3. When the account is created, Create and download a key file to your local laptop
+4. with a bash shell on your local laptop, do the following to remove line endings from the file: 
+``` bash
+vi gcp-keyfile.json
+# press :
+
+# Add the following 
+%s;\n; ;g
+# Press enter.
+
+# press : again
+
+# Execute the below command to save and close the editor
+wq!
+```
+5. On Gitlab, open your repository, go to Settings > CI/CD, expand Variables and create a new variable with the key GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. Make sure all 'flags' (protected, masked and expanded variable) are turned off, you don't need this. Also make sure that Environment scope stays on 'All'. 
+6. In your local repository, go to .gitlab-ci.yml and uncomment the whole script ( CTRL+A and CTRL+/)
+7. Make sure your variables are all added as intended in production.tfvars 
+8. Push your changes. You will notice that on a separate branch the pipeline will only run untill 'terraform plan'. The 'terraform apply', and thus the actual deployment will only be done when merging / pushing to the 'main' branch. 
+
+## 5.4 Terraform configuration
 
 There a few examples of deployments of Cloud Functions present in the folder
 `terraform/modules/main_triggers`. From one of these files, you can copy the contents and paste it onto your `terraform/main.tf`.
@@ -167,7 +221,7 @@ To extend your Terraform configuration, you will have to start dwelling into un-
 Please follow a few [Getting Started with Google Cloud in Terraform](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started)
 tutorials to get acquainted with the system.
 
-### 5.4 Python code
+### 5.5 Python code
 To start development, you will have to understand which service in Google Cloud is your code
 going to be deployed. To see how you can start coding your entry points, check the relevant folders:
 * For Cloud Functions, please the following entrypoints in `project_name/gcp.py`
