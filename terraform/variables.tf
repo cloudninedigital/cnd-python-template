@@ -1,6 +1,6 @@
 variable "application_name" {
   description = "Name of application"
-  type = string
+  type        = string
 }
 
 variable "project" {
@@ -26,7 +26,7 @@ variable "functions_region" {
 
 variable "source_repo_name" {
   description = "Name of the repository holding the source code in Cloud Source."
-  default = "github_cloudninedigital_cnd-etl-template"
+  default     = "github_cloudninedigital_cnd-etl-template"
 }
 
 variable "source_repo_branch" {
