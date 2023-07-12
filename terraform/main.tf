@@ -19,6 +19,8 @@ EOF
     ON_ERROR_CONTINUE="false"
     EXCLUDE_TEMP_IDS="false"
   }
+
+  stage = terraform.workspace
 }
 
 
