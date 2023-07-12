@@ -1,29 +1,100 @@
-# image:
-#    name: hashicorp/terraform:light
-#    entrypoint:
-#      - '/usr/bin/env'
-#      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-
-
-# before_script:
-#      - cd terraform
-#      - terraform --version
-#      - terraform init
-
-# stages:
-#       - plan
-#       - apply
-
-# plan:
-#    stage: plan
-#    script:
-#      - terraform plan -input=false -var-file="production.tfvars"
-
-# apply:
-#    stage: apply
-#    script:
-#      - terraform apply -input=false -auto-approve -var-file="production.tfvars"
-#    dependencies:
-#      - plan
-#    rules:
-#      - if: $CI_COMMIT_BRANCH == 'main'
+#image:
+#  name: hashicorp/terraform:light
+#  entrypoint:
+#    - '/usr/bin/env'
+#    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+#
+#variables:
+#  DEVELOPMENT_STAGE: "dev"
+#  PRODUCTION_STAGE: "prd"
+#  STAGING_STAGE: "stg"
+#  DEVELOPMENT_BRANCH: "development"
+#  STAGING_BRANCH: "main"
+#
+#before_script:
+#  - cd terraform
+#  - terraform --version
+#  - terraform init
+#  - ./helpers/init_workspaces.sh
+#
+#stages:
+#  - validate
+#  - plan
+#  - apply
+#
+#.rules-development:
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == $DEVELOPMENT_BRANCH
+#  variables:
+#    TERRAFORM_WORKSPACE: $DEVELOPMENT_STAGE
+#
+#
+#.rules-staging:
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == $STAGING_BRANCH
+#  variables:
+#    TERRAFORM_WORKSPACE: $STAGING_STAGE
+#
+#.rules-production:
+#  rules:
+#    - if: $CI_COMMIT_TAG
+#  variables:
+#    TERRAFORM_WORKSPACE: $PRODUCTION_STAGE
+#
+#.validate:
+#  stage: validate
+#  script:
+#    - ./helpers/deploy.sh -a validate -s $TERRAFORM_WORKSPACE
+#
+#.plan:
+#  stage: plan
+#  script:
+#    - ./helpers/deploy.sh -a plan -s $TERRAFORM_WORKSPACE
+#
+#.apply:
+#  stage: apply
+#  script:
+#    - ./helpers/deploy.sh -a apply -s $TERRAFORM_WORKSPACE
+#
+#
+#validate-development:
+#  extends:
+#    - .validate
+#    - .rules-development
+#  dependencies:
+#    - plan-development
+#
+#validate-staging:
+#  extends:
+#    - .validate
+#    - .rules-staging
+#  dependencies:
+#    - plan-staging
+#
+#validate-production:
+#  extends:
+#    - .validate
+#    - .rules-production
+#  dependencies:
+#    - plan-production
+#
+#apply-development:
+#  extends:
+#    - .apply
+#    - .rules-development
+#  dependencies:
+#    - plan-development
+#
+#apply-staging:
+#  extends:
+#    - .apply
+#    - .rules-staging
+#  dependencies:
+#    - plan-staging
+#
+#apply-production:
+#  extends:
+#    - .apply
+#    - .rules-production
+#  dependencies:
+#    - plan-production
