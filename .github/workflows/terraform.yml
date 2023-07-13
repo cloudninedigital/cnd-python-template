@@ -62,21 +62,22 @@
 #
 #    # Generates an execution plan for Terraform in development
 #    - name: Terraform Plan Development
-#      if: github.ref == env.DEVELOPMENT_REF
+#      # Plan if not on staging branch or tag
+#      if: github.ref != env.STAGING_REF && !startsWith(github.ref, 'refs/tags/v')
 #      run: ./helpers/deploy.sh -a plan -s $DEVELOPMENT_STAGE
 #      env:
 #        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 #
 #    # Generates an execution plan for Terraform in staging
 #    - name: Terraform Plan Staging
-#      if: github.ref == env.STAGING_REF
+#      if: github.ref == env.STAGING_REF || github.ref == env.DEVELOPMENT_REF
 #      run: ./helpers/deploy.sh -a plan -s $STAGING_STAGE
 #      env:
 #        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 #
 #    # Generates an execution plan for Terraform in production
 #    - name: Terraform Plan Production
-#      if: startsWith(github.ref, 'refs/tags/v')
+#      if: startsWith(github.ref, 'refs/tags/v') || github.ref == env.STAGING_REF
 #      run: ./helpers/deploy.sh -a plan -s $PRODUCTION_STAGE
 #      env:
 #        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
