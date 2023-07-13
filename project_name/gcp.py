@@ -1,6 +1,8 @@
+import logging
+
 import functions_framework
-import re
-from project_name.base import export_bucket_file_to_bq, refresh_data, execute_query_script
+from project_name.base import export_bucket_file_to_bq, refresh_data
+from project_name.bq_executor import execute_query_script
 
 
 @functions_framework.cloud_event
@@ -44,19 +46,12 @@ def main_pubsub(cloud_event):
 
 @functions_framework.cloud_event
 def main_bigquery_event(cloud_event):
+    from .bq_executor import get_dataset_from_cloud_event, NoDatasetUpdatedException, execute_query_script
 
-    data = cloud_event.data
-    print(data)
-
-    if not 'metadata' in data['protoPayload'] or \
-    not 'tableDataChange' in data['protoPayload']['metadata'].keys() or \
-     not 'insertedRowsCount' in data['protoPayload']['metadata']['tableDataChange'].keys() or \
-     int(data['protoPayload']['metadata']['tableDataChange']['insertedRowsCount']) < 1:
+    try:
+        dataset, table = get_dataset_from_cloud_event(cloud_event)
+    except NoDatasetUpdatedException:
+        logging.warning("No dataset was updated or no rows were updated. Nothing to do.")
         return
-
-    # this seems unsafe but the function wouldn't have triggered if this pattern did not exist
-    dataset = re.search('datasets\/(.*)\/tables', data['protoPayload']['resourceName'])[1]
-    table = re.search('/tables/(.*)', data['protoPayload']['resourceName'])[1]
-    print((dataset, table))
     # Implement processing of file here
     execute_query_script(f'{dataset}.{table}')
