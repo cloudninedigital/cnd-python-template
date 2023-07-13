@@ -13,13 +13,16 @@ class BigQueryExecutorTableConfig:
     def replace_environment(self):
         """Replace environment placeholder in table name with environment name"""
         if isinstance(self._config, list):
+            # replace environment in script names
             for i, table in enumerate(self._config):
                 self._config[i] = self._config[i].format(env=self._environment)
         else:
+            # replace environment in script names
             for i, table in enumerate(self._config["scripts"]):
                 self._config["scripts"][i] = self._config["scripts"][i].format(
                     env=self._environment
                 )
+            # replace environment in variables
             if self.variables is not None:
                 for k, v in self.variables.items():
                     self.variables[k] = v.format(env=self._environment)
@@ -40,8 +43,15 @@ class BigQueryExecutorTableConfig:
 
 
 class BigQueryExecutorConfig:
-    def __init__(self, config):
+    def __init__(self, config, environment=None):
         self._config = config
+        self._environment = environment or os.environ.get("ENVIRONMENT")
+
+        if self._environment is not None:
+            self.replace_environment()
+
+    def replace_environment(self):
+        self._config = {k.format(env=self._environment): v for k, v in self._config.items()}
 
     def __getitem__(self, table):
         """Returns BigQueryExecutorTableConfig for specified table pattern
@@ -58,10 +68,10 @@ class BigQueryExecutorConfig:
             # Here we test for a partial match of the table name, so accommodate for triggering on sharded tables
             if k not in table:
                 continue
-            return BigQueryExecutorTableConfig(self._config[k])
+            return BigQueryExecutorTableConfig(self._config[k], environment=self._environment)
 
     @classmethod
-    def from_string(cls, serialized_config):
+    def from_string(cls, serialized_config, **kwargs):
         """Returns BigQueryExecutorConfig from a JSON string
 
         Args:
@@ -70,10 +80,10 @@ class BigQueryExecutorConfig:
         Returns:
             BigQueryExecutorConfig
         """
-        return cls(json.loads(serialized_config))
+        return cls(json.loads(serialized_config), **kwargs)
 
     @classmethod
-    def from_file(cls, config_file):
+    def from_file(cls, config_file, **kwargs):
         """Returns BigQueryExecutorConfig from a JSON file
 
         Args:
@@ -83,10 +93,10 @@ class BigQueryExecutorConfig:
             BigQueryExecutorConfig
         """
         with open(config_file) as f:
-            return cls(json.load(f))
+            return cls(json.load(f), **kwargs)
 
     @classmethod
-    def from_gcs(cls, file_name):
+    def from_gcs(cls, file_name, **kwargs):
         """Returns BigQueryExecutorConfig from a JSON file in Google Cloud Storage
 
         Bucket name and credentials are taken from environment variables.
@@ -101,7 +111,7 @@ class BigQueryExecutorConfig:
 
         gcs = GoogleCloudStorage()
         serialized_config = gcs.download_file(file_name)
-        return cls.from_string(serialized_config)
+        return cls.from_string(serialized_config, **kwargs)
 
 
 class NoDatasetUpdatedException(Exception):
