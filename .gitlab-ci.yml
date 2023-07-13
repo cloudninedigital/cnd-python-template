@@ -53,6 +53,7 @@
 #
 #.apply:
 #  stage: apply
+#  when: manual
 #  script:
 #    - ./helpers/deploy.sh -a apply -s $TERRAFORM_WORKSPACE
 #
