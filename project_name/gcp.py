@@ -82,11 +82,15 @@ def execute_query_script(table, config_file_location=None):
     table_config = executor_config[table]
     scripts = table_config.scripts
     variables = table_config.variables
+    tables = table_config.tables
     for sfl in scripts:
         # TODO use pathlib instead
         path = "/".join(sfl.split("/")[:-1])
         gcs.download_file(sfl, f"./{path}")
         bq = BigQueryScriptExecutor(
-            script_file_location=f"./{sfl}", table=table, variables=variables
+            script_file_location=f"./{sfl}",
+            table=table,
+            variables=variables,
+            table_markers=tables
         )
         bq.execute_script_file()

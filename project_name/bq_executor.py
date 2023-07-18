@@ -38,8 +38,19 @@ class BigQueryExecutorTableConfig:
     def variables(self):
         if isinstance(self._config, list):
             return None
+        elif "variables" not in self._config:
+            return None
         else:
             return self._config["variables"]
+
+    @property
+    def tables(self):
+        if isinstance(self._config, list):
+            return None
+        elif "tables" not in self._config:
+            return None
+        else:
+            return self._config["tables"]
 
 
 class BigQueryExecutorConfig:
