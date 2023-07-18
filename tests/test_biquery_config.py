@@ -35,6 +35,35 @@ def test_updated_config_schema():
     assert config["dataset1.table1"].variables == {"variable1": "value1", "variable2": "value2"}
     assert config["dataset2.table2"].scripts == ["script3.sql", "script4.sql"]
     assert config["dataset2.table2"].variables == {"variable3": "value3", "variable4": "value4"}
+    assert config["dataset2.table2"].tables is None
+
+
+def test_updated_config_schema_without_variables():
+    config = BigQueryExecutorConfig.from_string(
+        """
+        {
+           "dataset1.table1": {
+                "scripts": [
+                    "script1.sql",
+                    "script2.sql"
+                ]
+            },
+            "dataset2.table2": {
+                "scripts": [
+                    "script3.sql",
+                    "script4.sql"
+                ]
+            }
+        }
+        """
+    )
+
+    assert config["dataset1.table1"].scripts == ["script1.sql", "script2.sql"]
+    assert config["dataset1.table1"].variables is None
+    assert config["dataset1.table1"].tables is None
+    assert config["dataset2.table2"].scripts == ["script3.sql", "script4.sql"]
+    assert config["dataset2.table2"].variables is None
+    assert config["dataset2.table2"].tables is None
 
 
 def test_basic_schema():
@@ -57,6 +86,7 @@ def test_basic_schema():
     assert config["dataset1.table1"].variables is None
     assert config["dataset2.table2"].scripts == ["script3.sql", "script4.sql"]
     assert config["dataset2.table2"].variables is None
+    assert config["dataset2.table2"].tables is None
 
 
 @pytest.fixture
@@ -208,3 +238,47 @@ def test_environment_substitution_in_table_names():
     assert config["dataset1.table1_dev"].variables is None
     assert config["dataset2.table2_dev"].scripts == ["script3.sql", "script4.sql"]
     assert config["dataset2.table2_dev"].variables is None
+
+
+def test_upgraded_schema_with_tables():
+    config = BigQueryExecutorConfig.from_string(
+        """
+        {
+              "dataset1.table1": {
+                "scripts": [
+                    "script1.sql",
+                    "script2.sql"
+                ],
+                "variables": {
+                    "variable1": "value1",
+                    "variable2": "value2"
+                },
+                "tables": [
+                    "dataset1.table1",
+                    "dataset2.table2"
+                ]
+            },
+            "dataset2.table2": {
+                "scripts": [
+                    "script3.sql",
+                    "script4.sql"
+                ],
+                "variables": {
+                    "variable3": "value3",
+                    "variable4": "value4"
+                },
+                "tables": [
+                    "dataset1.table1",
+                    "dataset2.table2"
+                ]
+            }
+        }
+        """
+    )
+
+    assert config["dataset1.table1"].scripts == ["script1.sql", "script2.sql"]
+    assert config["dataset1.table1"].variables == {"variable1": "value1", "variable2": "value2"}
+    assert config["dataset1.table1"].tables == ["dataset1.table1", "dataset2.table2"]
+    assert config["dataset2.table2"].scripts == ["script3.sql", "script4.sql"]
+    assert config["dataset2.table2"].variables == {"variable3": "value3", "variable4": "value4"}
+    assert config["dataset2.table2"].tables == ["dataset1.table1", "dataset2.table2"]
