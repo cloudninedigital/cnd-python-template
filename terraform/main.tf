@@ -4,7 +4,7 @@
 
 module "cgf_bigquery" {
   source      = "./modules/gf_gen2_bigquery_trigger_source_repo"
-  name        = var.application_name
+  name        = "${var.application_name}-${terraform.workspace}"
   description = <<EOF
   This function will trigger when a bigquery table create or delete has happened
 EOF
@@ -20,8 +20,6 @@ EOF
     EXCLUDE_TEMP_IDS  = "false"
     ENVIROMENT        = terraform.workspace
   }
-
-  stage = terraform.workspace
 }
 
 
