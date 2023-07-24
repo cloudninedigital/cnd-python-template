@@ -41,18 +41,29 @@ def main_pubsub(cloud_event):
 
     return "Processing was successful"
 
+@functions_framework.http
+def main_bigquery_http_event(request):
+    request_json = request.get_json(silent=True)
+    print(request_json)
+    table_updated = request_json.get('table_updated')
+    if not table_updated:
+        return main_bigquery_event(request_json.get('cf_event'))
+    execute_query_script(table_updated)
+    return "OK"
 
 @functions_framework.cloud_event
 def main_bigquery_event(cloud_event):
-
-    data = cloud_event.data
+    try:
+        data = cloud_event.data
+    except: 
+        data = cloud_event.get("data")
     print(data)
 
     if not 'metadata' in data['protoPayload'] or \
     not 'tableDataChange' in data['protoPayload']['metadata'].keys() or \
      not 'insertedRowsCount' in data['protoPayload']['metadata']['tableDataChange'].keys() or \
      int(data['protoPayload']['metadata']['tableDataChange']['insertedRowsCount']) < 1:
-        return
+        return "not_created_inserted"
 
     # this seems unsafe but the function wouldn't have triggered if this pattern did not exist
     dataset = re.search('datasets\/(.*)\/tables', data['protoPayload']['resourceName'])[1]
@@ -60,3 +71,4 @@ def main_bigquery_event(cloud_event):
     print((dataset, table))
     # Implement processing of file here
     execute_query_script(f'{dataset}.{table}')
+    return "OK"

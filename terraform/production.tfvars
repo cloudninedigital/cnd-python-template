@@ -1,3 +1,2 @@
-application_name = "<changethisname>"
-project="<changethisvalue>"
-bucket="<changethisvalue>"
+project="cloudnine-digital"
+bucket="workflows_test_dennis"
