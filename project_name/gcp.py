@@ -47,6 +47,15 @@ def main_pubsub(cloud_event):
 
     return "Processing was successful"
 
+@functions_framework.http
+def main_bigquery_http_event(request):
+    request_json = request.get_json(silent=True)
+    print(request_json)
+    table_updated = request_json.get('table_updated')
+    if not table_updated:
+        return main_bigquery_event(request_json.get('cf_event'))
+    execute_query_script(table_updated)
+    return "OK"
 
 @functions_framework.cloud_event
 def main_bigquery_event(cloud_event):
@@ -56,9 +65,10 @@ def main_bigquery_event(cloud_event):
         dataset, table = get_dataset_from_cloud_event(cloud_event)
     except NoDatasetUpdatedException:
         logging.warning("No dataset was updated or no rows were updated. Nothing to do.")
-        return
+        return "not_created_inserted"
     # Implement processing of file here
     execute_query_script(f'{dataset}.{table}')
+    return "OK"
 
 
 # TODO make this function also be able to execute a local config and script file
