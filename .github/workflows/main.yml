@@ -32,7 +32,7 @@ jobs:
         run: make lint
 
   tests_linux:
-    needs: linter
+    #needs: linter
     strategy:
       fail-fast: false
       matrix:

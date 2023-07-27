@@ -31,12 +31,12 @@ variable "source_repo_name" {
 
 variable "source_repo_branch" {
   description = "Branch name containing code to be deployed."
-  type = string
-  default = "main"
+  type        = string
+  default     = "main"
 }
 
 variable "bucket" {
   description = "bucket name."
-  type = string
-  default=""
+  type        = string
+  default     = ""
 }

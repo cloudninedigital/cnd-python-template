@@ -1,6 +1,12 @@
+import logging
+import os
+
 import functions_framework
-import re
-from project_name.base import export_bucket_file_to_bq, refresh_data, execute_query_script
+
+from project_name.SQL.bigquery_executor import BigQueryScriptExecutor
+from project_name.base import export_bucket_file_to_bq, refresh_data
+from project_name.bq_executor import BigQueryExecutorConfig
+from cnd_tools.cloudstorage.google_storage import GoogleCloudStorage
 
 
 @functions_framework.cloud_event
@@ -44,19 +50,47 @@ def main_pubsub(cloud_event):
 
 @functions_framework.cloud_event
 def main_bigquery_event(cloud_event):
+    from .bq_executor import get_dataset_from_cloud_event, NoDatasetUpdatedException
 
-    data = cloud_event.data
-    print(data)
-
-    if not 'metadata' in data['protoPayload'] or \
-    not 'tableDataChange' in data['protoPayload']['metadata'].keys() or \
-     not 'insertedRowsCount' in data['protoPayload']['metadata']['tableDataChange'].keys() or \
-     int(data['protoPayload']['metadata']['tableDataChange']['insertedRowsCount']) < 1:
+    try:
+        dataset, table = get_dataset_from_cloud_event(cloud_event)
+    except NoDatasetUpdatedException:
+        logging.warning("No dataset was updated or no rows were updated. Nothing to do.")
         return
-
-    # this seems unsafe but the function wouldn't have triggered if this pattern did not exist
-    dataset = re.search('datasets\/(.*)\/tables', data['protoPayload']['resourceName'])[1]
-    table = re.search('/tables/(.*)', data['protoPayload']['resourceName'])[1]
-    print((dataset, table))
     # Implement processing of file here
     execute_query_script(f'{dataset}.{table}')
+
+
+# TODO make this function also be able to execute a local config and script file
+def execute_query_script(table, config_file_location=None):
+    """
+    Download the config file from the location specified in the environment variable CONFIG_FILE_LOCATION
+    and execute the script file specified in the config file for the table specified in the function call.
+
+    Args:
+        table: Table name to execute the script for (should be present in config file)
+        config_file_location: Config file location (can be set through environment variable CONFIG_FILE_LOCATION).
+    Defaults to "table_script_lookup.json"
+    """
+    gcs = GoogleCloudStorage()
+
+    config_file_location = config_file_location or os.getenv("CONFIG_FILE_LOCATION")
+    if config_file_location is None:
+        config_file_location = "table_script_lookup.json"
+
+    executor_config = BigQueryExecutorConfig.from_gcs(config_file_location)
+    table_config = executor_config[table]
+    scripts = table_config.scripts
+    variables = table_config.variables
+    tables = table_config.tables
+    for sfl in scripts:
+        # TODO use pathlib instead
+        path = "/".join(sfl.split("/")[:-1])
+        gcs.download_file(sfl, f"./{path}")
+        bq = BigQueryScriptExecutor(
+            script_file_location=f"./{sfl}",
+            table=table,
+            variables=variables,
+            table_markers=tables
+        )
+        bq.execute_script_file()

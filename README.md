@@ -59,7 +59,12 @@ This will be the folder in your you cloned your repository.
 $ cd <my-project-folder>/terraform/remote-state
 ```
 
-3. Apply the terraform configuration for the remote state bucket. 
+3. Initialize terraform with the following command:
+```bash
+$ terraform init
+```
+
+4. Apply the terraform configuration for the remote state bucket. 
 ```bash
 $ terraform apply
 ```
@@ -80,6 +85,12 @@ terraform {
 ````bash
 $ terraform init
 ````
+
+9. Run the workspace generation script
+```bash
+$ ./helpers/init_workspaces.sh
+```
+You should see that the staging and production workspaces have been created.
 
 
 If all goes well, your bucket is now the central storage for the terraform state. Like this, all developers collaborating
@@ -110,8 +121,14 @@ internally is [cnd-tools](https://github.com/cloudninedigital/cnd-tools). You wi
 is already configured with the [CND Artifact Registry for python packages](https://console.cloud.google.com/artifacts/python/cloudnine-digital/europe-west4/cnd-tools-repo?project=cloudnine-digital).
 
 This is however, not sufficient, as you are working in a different project than the one where the repository is located.
-For this to work, the Cloud Build service account of your project needs to be given role **Artifact Registry Reader** 
-role in the original project hosting the python package registry: 
+For this to work, the Cloud Build service account of your project needs to be given role **Artifact Registry Reader**
+role in the original project hosting the python package registry.
+
+If you are up for using terraform for this step, please follow the instructions in 
+[this repo](https://github.com/cloudninedigital/cnd-cloudninedigital-terraform#giving-permissions-to-download-python-packages-in-a-client-project).
+Note that managing these permissions with terraform is not mandatory, but it is recommended for the sake of consistency.
+Otherwise, follow the instructions below:
+
 * Go to the project [cloudnine-digital](https://console.cloud.google.com/home/dashboard?project=cloudnine-digital).
 * Navigate to **IAM**
 * Click **Grant Access**
@@ -121,10 +138,6 @@ to the project ID_. This project number belongs to the project you are deploying
 * Give it **Artifact Registry Reader** role.
 
 See relevant documentation [here](https://cloud.google.com/artifact-registry/docs/integrate-functions).
-
-> **Note for template developers** As we advance further, this IAM management should move to a `cloudnine-digital`
-> project specific terraform.
-
 
 > **Note for users** For reasons not known at the moment of writing, installing `cnd_tools` with a runtime environment `python311`
 > is not functional due to an incompatibility between the `pandas` library and Cloud Build engine. Please use `python310`
@@ -153,40 +166,13 @@ Please take the following steps:
 > **Note**: This process is relevant for 1st gen Cloud Build repositories. Soon the CND developers
 > will automate the connection of 2nd gen Cloud Build repositories, rendering the step 5.3 obsolete.
 
-## 5.3a Enable automated deployment on Github
-
-For Github, the below steps can be followed:
-
-1. In your GCP project console, create a new service account (named something along the lines of terraform-github-executor)
-2. Provide this service account with the basic role 'Editor', and the 'Security Admin' role. 
-3. When the account is created, Create and download a key file to your local laptop
-4. with a bash shell on your local laptop, do the following to remove line endings from the file: 
-``` bash
-vi gcp-keyfile.json
-# press :
-
-# Add the following 
-%s;\n; ;g
-# Press enter.
-
-# press : again
-
-# Execute the below command to save and close the editor
-wq!
-```
-5. On Github, in your repository, go to Settings → Secrets → New Secret, and create a secret named GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. 
-6. In your local repository, go to .github/workflows/terraform.yml and uncomment the whole script ( CTRL+A and CTRL+/)
-7. Make sure your variables are all added as intended in production.tfvars 
-8. Push your changes. You will notice that on a separate branch the pipeline will only run untill 'terraform plan'. The 'terraform apply', and thus the actual deployment will only be done when merging / pushing to the 'main' branch. 
-
-
-## 5.3b Enable automated deployment on Gitlab
+## 5.3 Enable automated deployment on Gitlab or GitHub
 
 For Gitlab, the below steps can be followed:
 
 1. In your GCP project console, create a new service account (named something along the lines of terraform-gitlab-executor)
 2. Provide this service account with the basic role 'Editor', and the 'Security Admin' role. 
-3. When the account is created, Create and download a key file to your local laptop
+3. When the account is created, Create and download a JSON key file to your local laptop
 4. with a bash shell on your local laptop, do the following to remove line endings from the file: 
 ``` bash
 vi gcp-keyfile.json
@@ -201,10 +187,20 @@ vi gcp-keyfile.json
 # Execute the below command to save and close the editor
 wq!
 ```
-5. On Gitlab, open your repository, go to Settings > CI/CD, expand Variables and create a new variable with the key GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. Make sure all 'flags' (protected, masked and expanded variable) are turned off, you don't need this. Also make sure that Environment scope stays on 'All'. 
-6. In your local repository, go to .gitlab-ci.yml and uncomment the whole script ( CTRL+A and CTRL+/)
-7. Make sure your variables are all added as intended in production.tfvars 
-8. Push your changes. You will notice that on a separate branch the pipeline will only run untill 'terraform plan'. The 'terraform apply', and thus the actual deployment will only be done when merging / pushing to the 'main' branch. 
+5a. **If you are using GitLab**, open your repository, go to Settings > CI/CD, expand Variables and create a new 
+variable with the key GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. 
+Make sure all 'flags' (protected, masked and expanded variable) are turned off, you don't need this. 
+Also make sure that Environment scope stays on 'All'. 
+5b. **If you are using GitHub**, in your repository, go to **Settings** → **Secrets and Variables** → **Actions** -> New repository secret, and 
+create a secret named GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. 
+6a. **If you are using GitLab**, in your local repository, go to .gitlab-ci.yml and 
+uncomment the whole script ( CTRL+A and CTRL+/)
+6b. **If you are using GitHub**, in your local repository, go to .github/workflows/terraform.yml and uncomment the whole 
+script ( CTRL+A and CTRL+/)
+7. Make sure your variables are all added as intended in prd.tfvars, stg.tfvars and dev.tfvars
+8. Push your changes. You will notice that on a separate branch the pipeline will only run until 'terraform plan'. 
+The 'terraform apply', and thus the actual deployment will only be done when merging / pushing to the 
+'main' or 'development' branches or when a tag is pushed. 
 
 ## 5.4 Terraform configuration
 
@@ -239,68 +235,16 @@ expanded with more examples as we go forward and explore more Cloud services for
 
 > **NOTE**: **WAIT** until first CI run on github actions before cloning your new project.
 
-### What is included on this template?
 
-- 🖼️ Templates for starting multiple application types:
-  * **Basic low dependency** Python program (default) [use this template](https://github.com/cloudninedigital/cnd-etl-template/generate)
-  * **Flask** with database, admin interface, restapi and authentication [use this template](https://github.com/cloudninedigital/flask-project-template/generate).
-  **or Run `make init` after cloning to generate a new project based on a template.**
-- 📦 A basic [setup.py](setup.py) file to provide installation, packaging and distribution for your project.  
-  Template uses setuptools because it's the de-facto standard for Python packages, you can run `make switch-to-poetry` later if you want.
-- 🤖 A [Makefile](Makefile) with the most useful commands to install, test, lint, format and release your project.
-- 📃 Documentation structure using [mkdocs](http://www.mkdocs.org)
-- 💬 Auto generation of change log using **gitchangelog** to keep a HISTORY.md file automatically based on your commit history on every release.
-- 🐋 A simple [Containerfile](Containerfile) to build a container image for your project.  
-  `Containerfile` is a more open standard for building container images than Dockerfile, you can use buildah or docker with this file.
-- 🧪 Testing structure using [pytest](https://docs.pytest.org/en/latest/)
-- ✅ Code linting using [flake8](https://flake8.pycqa.org/en/latest/)
-- 📊 Code coverage reports using [codecov](https://about.codecov.io/sign-up/)
-- 🛳️ Automatic release to [PyPI](https://pypi.org) using [twine](https://twine.readthedocs.io/en/latest/) and github actions.
-- 🎯 Entry points to execute your program using `python -m <project_name>` or `$ project_name` with basic CLI argument parsing.
-- 🔄 Continuous integration using [Github Actions](.github/workflows/) with jobs to lint, test and release your project on Linux, Mac and Windows environments.
+### 5.6 Deploying your code
 
-> Curious about architectural decisions on this template? read [ABOUT_THIS_TEMPLATE.md](ABOUT_THIS_TEMPLATE.md)  
-> If you want to contribute to this template please open an [issue](https://github.com/cloudninedigital/cnd-etl-template/issues) or fork and send a PULL REQUEST.
+If you have followed step 5.3, then your deployments are automated in the following manner:
+* Any commits pushed to `main` branch will be deployed to staging environment
+* Any tags pushed will be deployed to production environment
+* If there is a `development` branch, then any push made to it is deployed to development environment
 
-[❤️ Sponsor this project](https://github.com/sponsors/cloudninedigital/)
+> **WARNING** Pushing tags to branches other than main might result in unexpected behaviour.
+> Please refrain from doing so.
 
-<!--  DELETE THE LINES ABOVE THIS AND WRITE YOUR PROJECT README BELOW -->
-
----
-# project_name
-
-[![codecov](https://codecov.io/gh/author_name/project_urlname/branch/main/graph/badge.svg?token=project_urlname_token_here)](https://codecov.io/gh/author_name/project_urlname)
-[![CI](https://github.com/author_name/project_urlname/actions/workflows/main.yml/badge.svg)](https://github.com/author_name/project_urlname/actions/workflows/main.yml)
-
-project_description
-
-## Install it from PyPI
-
-```bash
-pip install project_name
-```
-
-## Usage
-
-```py
-from project_name import BaseClass
-from project_name import base_function
-
-BaseClass().base_method()
-base_function()
-```
-
-```bash
-$ python -m project_name
-#or
-$ project_name
-```
-
-## Development
-
-Read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
-
-
-# GitHub Actions
-
-[Authentication of Google Cloud in GitHub Actions](https://github.com/marketplace/actions/authenticate-to-google-cloud).
+> **WARNING** Pushing tags to commits that are done earlier than previous tags will result in deployment that tag 
+> to production environment.
