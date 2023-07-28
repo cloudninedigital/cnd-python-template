@@ -1,17 +1,23 @@
-"""
-project_name base module.
+import json
+from .SQL.bigquery_executor import BigQueryScriptExecutor
+from cnd_tools.cloudstorage.google_storage import GoogleCloudStorage
 
-This is the principal module of the project_name project.
-here you put your main classes and objects.
+def export_bucket_file_to_bq(file_path):
+    pass
 
-Be creative! do whatever you want!
 
-If you want to replace this with a Flask application run:
+def refresh_data(*args, **kwargs):
+    pass
 
-    $ make init
 
-and then choose `flask` as template.
-"""
-
-# example constant variable
-NAME = "project_name"
+def execute_query_script(table):
+    gcs = GoogleCloudStorage()
+    table_script_lookup = json.loads(gcs.download_file('table_script_lookup.json'))
+    for k in table_script_lookup.keys():
+        if not k in table:        
+            continue
+        for sfl in table_script_lookup[k]:
+            path = "/".join(sfl.split("/")[:-1])
+            gcs.download_file(sfl, f'./{path}')
+            bq = BigQueryScriptExecutor(script_file_location=f'./{sfl}', table=table)
+            bq.execute_script_file()

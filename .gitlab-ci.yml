@@ -1,0 +1,29 @@
+# image:
+#    name: hashicorp/terraform:light
+#    entrypoint:
+#      - '/usr/bin/env'
+#      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+
+# before_script:
+#      - cd terraform
+#      - terraform --version
+#      - terraform init
+
+# stages:
+#       - plan
+#       - apply
+
+# plan:
+#    stage: plan
+#    script:
+#      - terraform plan -input=false -var-file="production.tfvars"
+
+# apply:
+#    stage: apply
+#    script:
+#      - terraform apply -input=false -auto-approve -var-file="production.tfvars"
+#    dependencies:
+#      - plan
+#    rules:
+#      - if: $CI_COMMIT_BRANCH == 'main'

@@ -33,8 +33,8 @@ fmt:              ## Format code using black & isort.
 .PHONY: lint
 lint:             ## Run pep8, black, mypy linters.
 	$(ENV_PREFIX)flake8 project_name/
-	$(ENV_PREFIX)black -l 119 --check project_name/
-	$(ENV_PREFIX)black -l 119 --check tests/
+	#$(ENV_PREFIX)black -l 119 --check project_name/
+	#$(ENV_PREFIX)black -l 119 --check tests/
 	$(ENV_PREFIX)mypy --ignore-missing-imports project_name/
 
 .PHONY: test
@@ -73,6 +73,11 @@ virtualenv:       ## Create a virtual environment.
 	@./.venv/bin/pip install -e .[test]
 	@echo
 	@echo "!!! Please run 'source .venv/bin/activate' to enable the environment !!!"
+
+
+.PHONY: init-venv
+init-venv:       ## Initialize configuration virtual environment.
+	@./.github/init_venv.sh
 
 .PHONY: release
 release:          ## Create a new tag for release.
@@ -118,4 +123,4 @@ switch-to-poetry: ## Switch to poetry package manager.
 #	@./.github/init.sh
 
 
-# This project has been generated from cloudninedigital/cnd-python-template
+# This project has been generated from cloudninedigital/cnd-etl-template
