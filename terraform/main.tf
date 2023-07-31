@@ -20,7 +20,7 @@ EOF
   environment = {
     PROJECT           = var.project
     GCS_PROJECT       = var.project
-    GCS_BUCKET_NAME   = "bigquery_http_function"
+    GCS_BUCKET_NAME   = "${var.application_name}-bqexecutor-sync"
     INCLUDE_VARIABLES = "false"
     SHOW_ALL_ROWS     = "false"
     ON_ERROR_CONTINUE = "false"
@@ -36,9 +36,11 @@ module "workflows_cf_main_trigger" {
   project = var.project
   dataset = "some_dataset"
   table = "iets"
-  trigger_type = "bq"
+  trigger_type = "schedule"
+  schedule = "*/2 * * * *"
   cloudfunctions = [{
-    "name": "bigquery_http_function"
+    "name": "bigquery_http_function",
+    "table_updated": "some_dataset.iets"
   },{
     "name": "bigquery_http_function",
     "table_updated": "some_dataset.nogiets"
