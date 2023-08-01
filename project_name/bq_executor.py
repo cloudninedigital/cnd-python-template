@@ -140,7 +140,13 @@ def get_dataset_from_cloud_event(cloud_event):
         dataset: Dataset name
         table: Table name
     """
-    data = cloud_event.data
+    try:
+        data = cloud_event.data
+    except Exception:
+        data = cloud_event.get("data")
+
+    if data is None:
+        raise ValueError("Cloud event does not contain data")
     print(data)
 
     if (
