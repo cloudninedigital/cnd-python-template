@@ -10,7 +10,7 @@
 # }
 
 # module "cf_http_trigger_bq_processing" {
-#   source      = "./modules/gf_gen1_http_trigger_source_repo"
+#   source      = "./modules/gf_gen2_http_trigger_source_repo"
 #   name        = "bigquery_http_function"
 #   description = <<EOF
 # This function will trigger one or multiple bigquery script based upon BigQuery Executor logic
@@ -46,6 +46,7 @@
 #     "table_updated": "some_dataset.nogiets"
 #   }]
 #   functions_region = "europe-west1"
+#   alert_on_failure = true
 # }
 
 
