@@ -14,10 +14,9 @@
                 ]
                 },
 
-    "dataset2_{env}.table1": {
+    "dataset1_{env}.table1": {
                 "scripts": [
-                    "script1.sql",
-                    "script2.sql"
+                    "script3.sql",
                 ],
                 "variables": {
                     "variable1": "value1_{env}",
