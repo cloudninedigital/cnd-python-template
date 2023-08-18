@@ -1,3 +1,26 @@
-{"some_dataset.iets": ["example.sql"],
-"some_dataset.nogiets": ["example.sql","example2.sql"],
-"analytics_223334187.events_": ["ga4_count_events.sql"]}
+{
+    "dataset1.table1": {
+                "scripts": [
+                    "script1.sql",
+                    "script2.sql"
+                ],
+                "variables": {
+                    "variable1": "value1_{env}",
+                    "variable2": "value2_{env}"
+                },
+                "tables": [
+                    "dataset1.table1",
+                    "dataset2.table2"
+                ]
+                },
+
+    "dataset2_{env}.table1": {
+                "scripts": [
+                    "script1.sql",
+                    "script2.sql"
+                ],
+                "variables": {
+                    "variable1": "value1_{env}",
+                    "variable2": "value2_{env}"
+                },
+}
