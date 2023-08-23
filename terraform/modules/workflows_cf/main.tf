@@ -28,7 +28,7 @@ resource "google_project_service" "workflows" {
 
 resource "google_project_iam_binding" "token-creator-iam" {
   provider = google-beta
-  project  = data.google_project.project.id
+  project  = var.project
   role     = "roles/iam.serviceAccountTokenCreator"
 
   members    = ["serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"]
@@ -36,18 +36,26 @@ resource "google_project_iam_binding" "token-creator-iam" {
 }
 
 
+# Enable IAM API
+resource "google_project_service" "iam" {
+  provider           = google-beta
+  service            = "iam.googleapis.com"
+  disable_on_destroy = false
+}
 
 # Create a service account for Eventarc trigger and Workflows
 resource "google_service_account" "workflows_service_account" {
   provider     = google-beta
-  account_id   = "workflows-sa"
+  account_id   = var.service_account_name
   display_name = "Workflows Service Account"
+
+  depends_on = [google_project_service.iam]
 }
 
 # Grant the logWriter role to the service account
 resource "google_project_iam_binding" "project_binding_eventarc" {
   provider = google-beta
-  project  = data.google_project.project.id
+  project  = var.project
   role     = "roles/logging.logWriter"
 
   members = ["serviceAccount:${google_service_account.workflows_service_account.email}"]
@@ -58,7 +66,7 @@ resource "google_project_iam_binding" "project_binding_eventarc" {
 # Grant the workflows.invoker role to the service account
 resource "google_project_iam_binding" "project_binding_workflows" {
   provider = google-beta
-  project  = data.google_project.project.id
+  project  = var.project
   role     = "roles/workflows.invoker"
 
   members = ["serviceAccount:${google_service_account.workflows_service_account.email}"]
@@ -71,7 +79,7 @@ resource "google_project_iam_binding" "project_binding_workflows" {
 resource "google_project_iam_binding" "eventarc_receiver_binding" {
   count = var.trigger_type == "bq" || var.trigger_type == "gcs" ? 1 : 0 
   provider = google-beta
-  project  = data.google_project.project.id
+  project  = var.project
   role     = "roles/eventarc.eventReceiver"
 
   members = ["serviceAccount:${google_service_account.workflows_service_account.email}"]
@@ -82,7 +90,7 @@ resource "google_project_iam_binding" "eventarc_receiver_binding" {
 resource "google_project_iam_member" "cloudscheduler_admin_binding" {
   count = var.trigger_type == "schedule" ? 1 : 0 
   provider = google-beta
-  project  = data.google_project.project.id
+  project  = var.project
   role     = "roles/cloudscheduler.admin"
 
   member = "serviceAccount:${google_service_account.workflows_service_account.email}"
@@ -94,7 +102,7 @@ resource "google_project_iam_member" "cloudscheduler_admin_binding" {
 # Grant cloud functions and cloud run invoker role
 resource "google_project_iam_binding" "cloud_functions_invoker_binding" {
   provider = google-beta
-  project  = data.google_project.project.id
+  project  = var.project
   role     = "roles/cloudfunctions.invoker"
 
   members = ["serviceAccount:${google_service_account.workflows_service_account.email}"]
@@ -104,7 +112,7 @@ resource "google_project_iam_binding" "cloud_functions_invoker_binding" {
 
 resource "google_project_iam_binding" "cloud_run_invoker_binding" {
   provider = google-beta
-  project  = data.google_project.project.id
+  project  = var.project
   role     = "roles/run.invoker"
 
   members = ["serviceAccount:${google_service_account.workflows_service_account.email}"]
@@ -116,7 +124,7 @@ resource "google_project_iam_binding" "cloud_run_invoker_binding" {
 resource "google_project_iam_binding" "gcs_binding" {
   count = var.trigger_type == "gcs" ? 1 : 0 
   provider = google-beta
-  project  = data.google_project.project.id
+  project  = var.project
   role     = "roles/storage.admin"
   members = ["serviceAccount:${google_service_account.workflows_service_account.email}"]
 }
@@ -157,9 +165,9 @@ module "alerting_policy" {
 # Only relevant when trigger type equals 'bq'
 resource "google_eventarc_trigger" "trigger_gbq_tf" {
   count = var.trigger_type == "bq" ? 1 : 0
-  name     = "${var.name}-trigger"
+  name     = replace("${var.name}-trigger", "_", "-")
   provider = google-beta
-  location = var.region
+  location = "global"
   matching_criteria {
     attribute = "type"
     value = "google.cloud.audit.log.v1.written"
@@ -210,9 +218,9 @@ resource "google_storage_bucket" "workflows_trigger_bucket" {
 # Create an Eventarc trigger routing GCS events to Workflows
 resource "google_eventarc_trigger" "trigger_gcs_tf" {
   count = var.trigger_type == "gcs" ? 1 : 0
-  name     = "${var.name}-trigger"
+  name     = replace("${var.name}-trigger", "_", "-")
   provider = google-beta
-  location = var.region
+  location = "global"
   matching_criteria {
     attribute = "type"
     value     = "google.cloud.storage.object.v1.finalized"
@@ -230,8 +238,11 @@ resource "google_eventarc_trigger" "trigger_gcs_tf" {
 
   service_account = google_service_account.workflows_service_account.email
 
-  depends_on = [google_project_service.pubsub, google_project_service.eventarc,
-  google_service_account.workflows_service_account]
+  depends_on = [
+    google_project_service.pubsub,
+    google_project_service.eventarc,
+    google_service_account.workflows_service_account
+  ]
 }
 
 
