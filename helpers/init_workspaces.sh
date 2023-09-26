@@ -16,5 +16,8 @@ terraform -chdir="terraform" workspace new stg
 # Create production workspace if it doesn't exist
 terraform -chdir="terraform" workspace new prd
 
+# Create production workspace if it doesn't exist
+terraform -chdir="terraform" workspace new shared
+
 # Change to development workspace
 terraform -chdir="terraform" workspace select dev
