@@ -42,21 +42,22 @@ into the right Google Cloud project ID while initializing.
 
 The configuration files for Terraform can be found in the `terraform/` folder.
 
-## 4. Create a bucket to store the terraform configuration state
-It is good practice to store the terraform config in a bucket existing in the 
-same project as all the other resources. To do this:
-1. Change the `terraform/remote-state/variables.tf` to something like:
+## 4. Create startup resources: remote-state bucket, base services enabling, terraform CI agent
+To startup, we've created a terraform folder that creates some base resources needed by any further deployment to work properly. This includes: 
+* A remote-state bucket. Terraform stores it's 'state' of all the resources it manages in some place. If you don't specify this, it will store it on your local laptop, which will make collaboration very hard. To avoid this, we create a terraform state GCS bucket that can serve as a state storage space. 
+* Some base services enabled. To run Terraform deployments from an automated CI flow, some base services need to be enabled for the deployment to actually work. This includes, for example, the cloud resource manager API. 
+* A terraform agent service account. To run Terraform deployments from an automated CI flow, you'll need a terraform agent service account that has the necessary rights to actually make a deployment. This is also created here. 
+
+
+To create the startup resources:
+1. Change the `terraform/local-bootstrap-startup/terraform.tfvars` to something like:
 ```terraform
-variable "project" {
-  description = "Project ID"
-  type = string
-  default = "<PROJECT-ID-YOU-ARE-WORKING-WITH>"
-}
+project="<yourprojectid>"
 ```
-2. Go to your command line and navigate to the `terraform/remote-state` folder.
+2. Go to your command line and navigate to the `terraform/local-bootstrap-startup` folder.
 This will be the folder in your you cloned your repository.
 ```bash
-$ cd <my-project-folder>/terraform/remote-state
+$ cd <my-project-folder>/terraform/local-bootstrap-startup
 ```
 
 3. Initialize terraform with the following command:
@@ -66,7 +67,7 @@ $ terraform init
 
 4. Apply the terraform configuration for the remote state bucket. 
 ```bash
-$ terraform apply
+$ terraform apply --var-file="terraform.tfvars"
 ```
 4. Type __yes__ when prompted to confirm the changes
 5. Copy the output value given by terraform on the variable `terraform_state_bucket`
@@ -108,72 +109,11 @@ There are two main parts to this work:
 
 See below for a few more details on both parts:
 
-
-### 5.1 Making CND internal dependencies installable
-> **Note** This step is not necessary if you are not intending to use any `cnd_tools` functionality. If you skip this step,
-> remember to remove the necessary lines from `requirements.txt` (usually the two first lines starting with "--extra-index-url" and
-> the import of `cnd-tools`.)
-
-
-For being able to deploy your code using internal dependencies from CND, we need to enable the Google Cloud Project
-that you are working on to be able to install these packages. At the time of writing, the only package that is provided
-internally is [cnd-tools](https://github.com/cloudninedigital/cnd-tools). You will notice that the file `requirements.txt`
-is already configured with the [CND Artifact Registry for python packages](https://console.cloud.google.com/artifacts/python/cloudnine-digital/europe-west4/cnd-tools-repo?project=cloudnine-digital).
-
-This is however, not sufficient, as you are working in a different project than the one where the repository is located.
-For this to work, the Cloud Build service account of your project needs to be given role **Artifact Registry Reader**
-role in the original project hosting the python package registry.
-
-If you are up for using terraform for this step, please follow the instructions in 
-[this repo](https://github.com/cloudninedigital/cnd-cloudninedigital-terraform#giving-permissions-to-download-python-packages-in-a-client-project).
-Note that managing these permissions with terraform is not mandatory, but it is recommended for the sake of consistency.
-Otherwise, follow the instructions below:
-
-* Go to the project [cloudnine-digital](https://console.cloud.google.com/home/dashboard?project=cloudnine-digital).
-* Navigate to **IAM**
-* Click **Grant Access**
-* Add the Cloud Build service account _of your client project_ as a new principal. The Cloud Build default service 
-account is `PROJECT_NUMBER@cloudbuild.gserviceaccount.com`. Note that here we use the _project number as opposed 
-to the project ID_. This project number belongs to the project you are deploying this current project to.
-* Give it **Artifact Registry Reader** role.
-
-See relevant documentation [here](https://cloud.google.com/artifact-registry/docs/integrate-functions).
-
-> **Note for users** For reasons not known at the moment of writing, installing `cnd_tools` with a runtime environment `python311`
-> is not functional due to an incompatibility between the `pandas` library and Cloud Build engine. Please use `python310`
-> for now.
-
-
-## 5.2 Link GitHub repo into a Google Cloud Source repo
-
-### CAUTION: THIS PART HAS PROBABLY BECOME IRRELEVANT DUE TO AUTOMATED DEPLOYMENTS and usage of the GCP ZIP archive option for cloud functions!
-This step is necessary before you can deploy any Cloud Functions to GCP.
-The Cloud Function configurations in our ETL template are set to use a source repository as a code source.
-
-For this to work, you need to link the GitHub repository that you are working on into Google Cloud Source repositories.
-
-Please take the following steps:
-1. Go to https://source.cloud.google.com/.
-2. Click **Add repository** (top-right of the window).
-3. Click **Connect external repository**.
-4. Type in (or seach for) your GCP project id.
-5. Choose **GitHub** as the Git provider.
-6. Authorize the storage of your credentials in Google Cloud.
-7. Click **Connect to GitHub**.
-8. Choose the GitHub repository that you wish to mirror.
-9. Click **Connect selected repository**
-
-> **Note**: This process is relevant for 1st gen Cloud Build repositories. Soon the CND developers
-> will automate the connection of 2nd gen Cloud Build repositories, rendering the step 5.3 obsolete.
-
-## 5.3 Enable automated deployment on Gitlab or GitHub
+## 5.1 Enable automated deployment on Gitlab or GitHub
 
 For Gitlab, the below steps can be followed:
-
-1. In your GCP project console, create a new service account (named something along the lines of terraform-gitlab-executor)
-2. Provide this service account with the basic role 'Editor', and the 'Security Admin' role. 
-3. When the account is created, Create and download a JSON key file to your local laptop
-4. with a bash shell on your local laptop, do the following to remove line endings from the file: 
+1. Assuming you've executed step 4 properly, you've already created a service account called terraform-agent@<project-id>.iam.gserviceaccount.com with the proper rights to do a deployment. In the 'Service Accounts' section, go to this service account, and create and download a JSON key file to your local laptop. 
+2. with a bash shell on your local laptop, do the following to remove line endings from the file: 
 ``` bash
 vi gcp-keyfile.json
 # press :
@@ -187,22 +127,22 @@ vi gcp-keyfile.json
 # Execute the below command to save and close the editor
 wq!
 ```
-5a. **If you are using GitLab**, open your repository, go to Settings > CI/CD, expand Variables and create a new 
+3a. **If you are using GitLab**, open your repository, go to Settings > CI/CD, expand Variables and create a new 
 variable with the key GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. 
 Make sure all 'flags' (protected, masked and expanded variable) are turned off, you don't need this. 
 Also make sure that Environment scope stays on 'All'. 
-5b. **If you are using GitHub**, in your repository, go to **Settings** → **Secrets and Variables** → **Actions** -> New repository secret, and 
+3b. **If you are using GitHub**, in your repository, go to **Settings** → **Secrets and Variables** → **Actions** -> New repository secret, and 
 create a secret named GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. 
-6a. **If you are using GitLab**, in your local repository, go to .gitlab-ci.yml and 
+4a. **If you are using GitLab**, in your local repository, go to .gitlab-ci.yml and 
 uncomment the whole script ( CTRL+A and CTRL+/)
-6b. **If you are using GitHub**, in your local repository, go to .github/workflows/terraform.yml and uncomment the whole 
+4b. **If you are using GitHub**, in your local repository, go to .github/workflows/terraform.yml and uncomment the whole 
 script ( CTRL+A and CTRL+/)
-7. Make sure your variables are all added as intended in prd.tfvars, stg.tfvars and dev.tfvars
-8. Push your changes. You will notice that on a separate branch the pipeline will only run until 'terraform plan'. 
+5. Make sure your variables are all added as intended in prd.tfvars, stg.tfvars and dev.tfvars
+6. Push your changes. You will notice that on a separate branch the pipeline will only run until 'terraform plan'. 
 The 'terraform apply', and thus the actual deployment will only be done when merging / pushing to the 
 'main' or 'development' branches or when a tag is pushed. 
 
-## 5.4 Terraform configuration
+## 5.2 Terraform configuration
 
 There a few examples of deployments of Cloud Functions present in the folder
 `terraform/modules/main_triggers`. From one of these files, you can copy the contents and paste it onto your `terraform/main.tf`.
@@ -216,7 +156,7 @@ To extend your Terraform configuration, you will have to start dwelling into un-
 Please follow a few [Getting Started with Google Cloud in Terraform](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started)
 tutorials to get acquainted with the system.
 
-### 5.5 Python code
+### 5.3 Python code
 To start development, you will have to understand which service in Google Cloud is your code
 going to be deployed. To see how you can start coding your entry points, check the relevant folders:
 * For Cloud Functions, please the following entrypoints in `project_name/gcp.py`
@@ -236,7 +176,7 @@ expanded with more examples as we go forward and explore more Cloud services for
 > **NOTE**: **WAIT** until first CI run on github actions before cloning your new project.
 
 
-### 5.6 Deploying your code
+### 5.4 Deploying your code
 
 If you have followed step 5.3, then your deployments are automated in the following manner:
 * Any commits pushed to `main` branch will be deployed to staging environment
