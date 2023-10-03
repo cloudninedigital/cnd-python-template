@@ -16,10 +16,11 @@
 
     "dataset1_{env}.table1": {
                 "scripts": [
-                    "script3.sql",
+                    "script3.sql"
                 ],
                 "variables": {
                     "variable1": "value1_{env}",
                     "variable2": "value2_{env}"
-                },
+                }
+}
 }
