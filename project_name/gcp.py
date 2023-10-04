@@ -63,6 +63,6 @@ def main_bigquery_event(cloud_event):
     from cnd_tools.database import bigquery_executor
     table = bigquery_executor.process_event(cloud_event)
     if table == "not_created_inserted":
-        return {"status": "not_created_inserted"}
+        return {"status": "not_created_inserted"}, 204
     else:
         return {"status": "OK"}
