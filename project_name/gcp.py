@@ -52,14 +52,17 @@ def main_bigquery_http_event(request):
     table_updated = request_json.get('table_updated')
     if not table_updated:
         return main_bigquery_event(request_json.get('cf_event'))
-    bigquery_executor.execute_query_script(table_updated)
-    return "OK"
+    else:
+        bigquery_executor.execute_query_script(table_updated)
+        return {"status": "OK"}
+
 
 
 @functions_framework.cloud_event
 def main_bigquery_event(cloud_event):
     from cnd_tools.database import bigquery_executor
-
-    bigquery_executor.process_event(cloud_event)
-
-    return "OK"
+    table = bigquery_executor.process_event(cloud_event)
+    if table == "not_created_inserted":
+        return {"status": "not_created_inserted"}
+    else:
+        return {"status": "OK"}
