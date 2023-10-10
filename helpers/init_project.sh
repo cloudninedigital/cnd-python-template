@@ -122,9 +122,12 @@ tf_sa=$(terraform -chdir=$boostrap_terraform_folder output -raw terraform_servic
 if [[ -f ./tf_sa_credentials.json ]]; then
   echo "Service account credentials already exist."
   read -p "Do you wish to overwrite the service account credentials? (y/n) " overwrite_credentials
+  if [[ $overwrite_credentials == "y" ]]; then
+    rm -v ./tf_sa_credentials.json ./tf_sa_credentials.json.tmp
+  fi
 fi
 
-if [[ $overwrite_credentials == "y" || ! -f ./tf_sa_credentials.json ]]; then
+if [[ ! -f ./tf_sa_credentials.json ]]; then
   echo -e "${BLUE}Downloading service account credentials...${NC}"
   gcloud iam service-accounts keys create ./tf_sa_credentials.json --iam-account=$tf_sa
   if [[ $? -eq 0 ]]; then
@@ -132,8 +135,7 @@ if [[ $overwrite_credentials == "y" || ! -f ./tf_sa_credentials.json ]]; then
   else
     echo -e "${RED}Service account credentials download failed.${NC}"
   fi
-else
-  echo -e "${BLUE}Skipping service account credentials download.${NC}"
+fi
 
 #Delete newlines from the service account credentials
 tr -d '\n' < ./tf_sa_credentials.json > ./tf_sa_credentials.json.tmp
