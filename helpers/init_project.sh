@@ -234,11 +234,13 @@ if [[ $commit_changes == "y" ]]; then
   fi
   echo -e "${BLUE}Committing changes to git...${NC}"
   git add $local_terraform_folder/*.tfvars
+  git add $local_terraform_folder/*/*.tfvars
   git add $local_terraform_folder/backend.tf
-  git add */backend.tf
+  git add $local_terraform_folder/*/backend.tf
   git add $boostrap_terraform_folder
+  git add .github/workflows/terraform.yml
   git commit -m"[init_project] Initialized project with terraform."
-  git push
+  git push --set-upstream origin $(git branch --show-current)
 fi
 
 ###############################################
