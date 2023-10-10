@@ -181,7 +181,7 @@ fi
 ###############################################
 
 # replace the state bucket name in the backend.tf file
-tf_bucket = $(terraform -chdir=$boostrap_terraform_folder output -raw terraform_state_bucket)
+tf_bucket=$(terraform -chdir=$boostrap_terraform_folder output -raw terraform_state_bucket)
 
 # remove the begin of line comments from backend.tf files
 find $local_terraform_folder -type f -name "backend.tf" -exec sed -i -e "s/^#\+//g" {} \;
