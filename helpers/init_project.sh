@@ -93,6 +93,7 @@ fi
 # [START] Initialize remote state and terraform service account
 ###############################################
 
+echo -e "${BLUE}Initializing remote state and terraform service account...${NC}"
 find $local_terraform_folder -type f -name "*.tfvars" -exec sed -i -e "s/\(project\s*=\s*\).*/\1\"${project_id}\"/g" {} \;
 
 terraform -chdir=$boostrap_terraform_folder init
@@ -114,6 +115,7 @@ fi
 ###############################################
 
 # Retrieve the service account credentials email
+echo -e "${BLUE}Retrieving terraform service account credentials...${NC}"
 tf_sa=$(terraform -chdir=$boostrap_terraform_folder output -raw terraform_service_account)
 
 # Retrieve the service account credentials
