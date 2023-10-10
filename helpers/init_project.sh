@@ -79,6 +79,11 @@ else
 fi
 
 echo "Using project_id: $project_id"
+read -p "Do you wish to continue? (y/n) " continue
+if [[ $continue != "y" ]]; then
+  echo -e "${RED}Aborting...${NC}"
+  exit 1
+fi
 ###############################################
 # [END] Get project id
 ###############################################
