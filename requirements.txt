@@ -1,5 +1,5 @@
 --extra-index-url https://europe-west4-python.pkg.dev/cloudnine-digital/cnd-tools-repo/simple
-cnd-tools[gcp]>=1.8.5
+cnd-tools[gcp]>=1.9.4
 functions-framework==3.1.0
 gcsfs==2022.7.1
 pandas
