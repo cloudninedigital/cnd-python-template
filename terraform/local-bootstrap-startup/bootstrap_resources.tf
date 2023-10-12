@@ -11,6 +11,7 @@ locals {
 
 resource "google_project_service" "services" {
   for_each = local.bootstrap_services
+  project  = var.project
   provider           = google-beta
   service            = each.value
   disable_on_destroy = false

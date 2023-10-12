@@ -24,7 +24,7 @@ Functions and Terraform as a deployment system.
 Follow [these instructions](https://wiki.cloudninedigital.nl/en/Processing-and-Delivery/Software-Development/Git/Getting-started-with-Git#cloning-an-existing-repository-from-a-remote-repository) 
 to clone a repository created on Github.
 
-## 3. Install Terraform and Cloud SDK CLI
+## 3. Install Terraform, Cloud SDK CLI and GitHub CLI
 
 At Cloud Nine Digital we use Terraform authenticated by Google Cloud credentials to deploy our resources in a GCP.
 
@@ -34,86 +34,38 @@ For more information about Terraform please visit their [Introduction](https://d
 [Google Cloud CLI](https://cloud.google.com/cli) (Command Line Interface) is a command-line interface that allows for interaction and creation of
 Google Cloud resources. In this particular case, we use it to enable authentication of Terraform, and not to create resources through it.
 
+[GitHub CLI](https://cli.github.com/) is a command-line interface that allows for interaction with GitHub repositories. 
+In this particular case, we use it to enable authentication of Terraform in our CI/CD pipelines.
+
 Before continuing please take the following steps: 
 * [Install](https://cloud.google.com/sdk/docs/install) and 
 [initialize](https://cloud.google.com/sdk/docs/initializing) your Google Cloud CLI. Make sure to authenticate
 into the right Google Cloud project ID while initializing. 
 * [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/install-cli?in=terraform%2Fgcp-get-started).
+* [Install GitHub CLI](https://cli.github.com/).
 
 The configuration files for Terraform can be found in the `terraform/` folder.
 
-## 4. Create startup resources: remote-state bucket, base services enabling, terraform CI agent
-To startup, we've created a terraform folder that creates some base resources needed by any further deployment to work properly. This includes: 
-* A remote-state bucket. Terraform stores it's 'state' of all the resources it manages in some place. If you don't specify this, it will store it on your local laptop, which will make collaboration very hard. To avoid this, we create a terraform state GCS bucket that can serve as a state storage space. 
-* Some base services enabled. To run Terraform deployments from an automated CI flow, some base services need to be enabled for the deployment to actually work. This includes, for example, the cloud resource manager API. 
-* A terraform agent service account. To run Terraform deployments from an automated CI flow, you'll need a terraform agent service account that has the necessary rights to actually make a deployment. This is also created here. 
+# 4. Run initialization script
+> Note: If you wish to do this manually, please follow the instructions in [manual_init.md](manual_init.md)
 
-
-To create the startup resources:
-1. Change the `terraform/local-bootstrap-startup/terraform.tfvars` to something like:
-```terraform
-project="<yourprojectid>"
-```
-2. Go to your command line and navigate to the `terraform/local-bootstrap-startup` folder.
-This will be the folder in your you cloned your repository.
+Run the following command to initialize your project:
 ```bash
-$ cd <my-project-folder>/terraform/local-bootstrap-startup
+$ ./helpers/init_project.sh
 ```
 
-3. Initialize terraform with the following command:
-```bash
-$ terraform init
-```
-
-4. Apply the terraform configuration for the remote state bucket. 
-```bash
-$ terraform apply --var-file="terraform.tfvars"
-```
-4. Type __yes__ when prompted to confirm the changes
-5. Copy the output value given by terraform on the variable `terraform_state_bucket`
-6. Change the file `terraform/backend.tf` to reflect your new bucket containing the state
-```terraform
-terraform {
-  backend "gcs" {
-    # TODO
-    bucket = "<NAME_OF_BUCKET_COPIED_IN_STEP_5>"
-    prefix = "terraform/state"
-  }
-}
-```
-7. __TODO add here instructions for optional terraform state locking__
-8. Go back to your terminal and initialize terraform with the following command:
-````bash
-$ terraform init
-````
-
-9. Run the workspace generation script
-```bash
-$ ./helpers/init_workspaces.sh
-```
-You should see that the staging and production workspaces have been created.
+The script will prompt you for the following information:
+* Your GCP project ID
+* Whether you want to enable GitHub CI/CD
 
 
-If all goes well, your bucket is now the central storage for the terraform state. Like this, all developers collaborating
-in this project will have access to the same terraform state.
-
-
-## 5. Start development work
-
-This is where your development journey begins. From here on the steps are highly dependent on the functionality
-you are trying to deploy in the cloud. 
-
-There are two main parts to this work:
-1. Building your Python code
-2. Building your Terraform configuration to deploy that code (as well as additional infrastructure that supports it).
-
-See below for a few more details on both parts:
-
-## 5.1 Enable automated deployment on Gitlab or GitHub
+## 5 Enable automated deployment on Gitlab or GitHub
+> Note: This step is already done for GitHub if you have run the `helpers/init_project.sh` script.
+> For Gitlab you will have to do this manually (for now :smile:) 
 
 For Gitlab, the below steps can be followed:
-1. Assuming you've executed step 4 properly, you've already created a service account called terraform-agent@<project-id>.iam.gserviceaccount.com with the proper rights to do a deployment. In the 'Service Accounts' section, go to this service account, and create and download a JSON key file to your local laptop. 
-2. with a bash shell on your local laptop, do the following to remove line endings from the file: 
+1. Assuming you've executed step 4 properly, you've already created a service account called terraform-agent@<project-id>.iam.gserviceaccount.com with the proper rights to do a deployment. In the 'Service Accounts' section, go to this service account, and create and download a JSON key file to your local laptop.
+2. with a bash shell on your local laptop, do the following to remove line endings from the file:
 ``` bash
 vi gcp-keyfile.json
 # press :
@@ -127,22 +79,34 @@ vi gcp-keyfile.json
 # Execute the below command to save and close the editor
 wq!
 ```
-3a. **If you are using GitLab**, open your repository, go to Settings > CI/CD, expand Variables and create a new 
-variable with the key GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. 
-Make sure all 'flags' (protected, masked and expanded variable) are turned off, you don't need this. 
-Also make sure that Environment scope stays on 'All'. 
-3b. **If you are using GitHub**, in your repository, go to **Settings** → **Secrets and Variables** → **Actions** -> New repository secret, and 
-create a secret named GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value. 
-4a. **If you are using GitLab**, in your local repository, go to .gitlab-ci.yml and 
+3a. **If you are using GitLab**, open your repository, go to Settings > CI/CD, expand Variables and create a new
+variable with the key GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value.
+Make sure all 'flags' (protected, masked and expanded variable) are turned off, you don't need this.
+Also make sure that Environment scope stays on 'All'.
+3b. **If you are using GitHub**, in your repository, go to **Settings** → **Secrets and Variables** → **Actions** -> New repository secret, and
+create a secret named GOOGLE_CREDENTIALS, and paste the contents of your changed keyfile as the value.
+4a. **If you are using GitLab**, in your local repository, go to .gitlab-ci.yml and
 uncomment the whole script ( CTRL+A and CTRL+/)
-4b. **If you are using GitHub**, in your local repository, go to .github/workflows/terraform.yml and uncomment the whole 
+4b. **If you are using GitHub**, in your local repository, go to .github/workflows/terraform.yml and uncomment the whole
 script ( CTRL+A and CTRL+/)
 5. Make sure your variables are all added as intended in prd.tfvars, stg.tfvars and dev.tfvars
-6. Push your changes. You will notice that on a separate branch the pipeline will only run until 'terraform plan'. 
-The 'terraform apply', and thus the actual deployment will only be done when merging / pushing to the 
-'main' or 'development' branches or when a tag is pushed. 
+6. Push your changes. You will notice that on a separate branch the pipeline will only run until 'terraform plan'.
+   The 'terraform apply', and thus the actual deployment will only be done when merging / pushing to the
+   'main' or 'development' branches or when a tag is pushed. 
 
-## 5.2 Terraform configuration
+## 6. Start development work
+
+This is where your development journey begins. From here on the steps are highly dependent on the functionality
+you are trying to deploy in the cloud. 
+
+There are two main parts to this work:
+1. Building your Python code
+2. Building your Terraform configuration to deploy that code (as well as additional infrastructure that supports it).
+
+See below for a few more details on both parts:
+
+
+## 6.1 Terraform configuration
 
 There a few examples of deployments of Cloud Functions present in the folder
 `terraform/modules/main_triggers`. From one of these files, you can copy the contents and paste it onto your `terraform/main.tf`.
@@ -156,7 +120,7 @@ To extend your Terraform configuration, you will have to start dwelling into un-
 Please follow a few [Getting Started with Google Cloud in Terraform](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started)
 tutorials to get acquainted with the system.
 
-### 5.3 Python code
+### 6.2 Python code
 To start development, you will have to understand which service in Google Cloud is your code
 going to be deployed. To see how you can start coding your entry points, check the relevant folders:
 * For Cloud Functions, please the following entrypoints in `project_name/gcp.py`
@@ -178,7 +142,7 @@ expanded with more examples as we go forward and explore more Cloud services for
 
 ### 5.4 Deploying your code
 
-If you have followed step 5.3, then your deployments are automated in the following manner:
+If you have followed step 5 or ran the `helpers/init_project.sh` script, then your deployments are automated in the following manner:
 * Any commits pushed to `main` branch will be deployed to staging environment
 * Any tags pushed will be deployed to production environment
 * If there is a `development` branch, then any push made to it is deployed to development environment
