@@ -70,7 +70,7 @@
 #
 #    # Generates an execution plan for Terraform in staging
 #    - name: Terraform Plan Staging
-#      if: github.ref == env.STAGING_REF || github.ref == env.DEVELOPMENT_REF
+#      if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
 #      run: ./helpers/deploy.sh -a plan -s $STAGING_STAGE
 #      env:
 #        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
