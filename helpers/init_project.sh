@@ -48,6 +48,96 @@ echo -e $NC
 ###############################################
 
 ###############################################
+# [START] Check if gcloud is installed
+###############################################
+
+# Check if gcloud is installed
+echo -e "${BLUE}Checking if gcloud is installed...${NC}"
+if ! command -v gcloud &> /dev/null
+then
+    echo -e "${RED}gcloud could not be found. Please install gcloud to continue. See https://cloud.google.com/sdk/docs/install${NC}"
+    exit
+else
+  echo -e "${GREEN}gcloud is installed.${NC}"
+fi
+
+# Check the account with which gcloud is logged in
+echo -e "${BLUE}Checking if gcloud is logged in...${NC}"
+if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" &> /dev/null
+then
+    echo -e "${RED}gcloud is not logged in. Please login to continue.${NC}"
+    gcloud auth application-default login
+else
+  echo -e "${GREEN}gcloud is logged in.${NC}"
+  account=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
+  echo "Using account: $account"
+  read -p "Do you wish to continue with this account? (y/n) " continue
+  if [[ $continue != "y" ]]; then
+    echo -e "${GREEN}Continuing with account ${account}.${NC}"
+  fi
+fi
+
+
+# Check if gcloud is initialized
+echo -e "${BLUE}Checking if gcloud is initialized...${NC}"
+if ! gcloud config get-value project &> /dev/null
+then
+    echo -e "${RED}gcloud is not initialized. Let's initialize it:${NC}"
+    gcloud init
+else
+  echo -e "${GREEN}gcloud is initialized.${NC}"
+fi
+
+###############################################
+# [END] Check if gcloud is installed
+###############################################
+
+###############################################
+# [START] Check if terraform is installed
+###############################################
+
+# Check if terraform is installed
+if ! command -v terraform &> /dev/null
+then
+    echo -e "${RED}terraform could not be found. Please install terraform to continue. See https://learn.hashicorp.com/tutorials/terraform/install-cli${NC}"
+    exit
+else
+  echo -e "${GREEN}terraform is installed.${NC}"
+fi
+
+###############################################
+# [END] Check if terraform is installed
+###############################################
+
+
+###############################################
+# [START] Check if GitHub CLI is installed
+###############################################
+
+echo -e "${BLUE}Checking if GitHub CLI is installed...${NC}"
+if ! command -v gh &> /dev/null
+then
+    echo -e "${RED}gh could not be found. Please install gh to continue. See https://cli.github.com/${NC}"
+    exit
+else
+  echo -e "${GREEN}gh is installed.${NC}"
+fi
+
+# Check if logged in
+
+if ! gh auth status &> /dev/null
+then
+  echo -e "${RED}gh is not logged in. Please login to continue.${NC}"
+  gh auth login
+else
+  echo -e "${GREEN}gh is logged in.${NC}"
+fi
+
+###############################################
+# [END] Check if GitHub CLI is installed
+###############################################
+
+###############################################
 # [START] Get project id
 ###############################################
 

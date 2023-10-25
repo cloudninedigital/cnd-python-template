@@ -2,7 +2,8 @@ locals {
   bootstrap_services = {
     cloudbuild = "cloudbuild.googleapis.com",
     cloudresourcemanager = "cloudresourcemanager.googleapis.com",
-    iam = "iam.googleapis.com"
+    iam = "iam.googleapis.com",
+    serviceusage = "serviceusage.googleapis.com"
   }
   terraform_permissions = {
     editor = "roles/editor",

@@ -54,6 +54,10 @@ Run the following command to initialize your project:
 $ ./helpers/init_project.sh
 ```
 
+> Note: The script will help you check the status of installation of the necessary tools.
+> It will not install them for you, but if they are installed they will be used.
+> Furthermore it will check if these tools are properly authenticated, and if not it will help you authenticate them.
+
 The script will prompt you for the following information:
 * Your GCP project ID
 * Whether you want to enable GitHub CI/CD

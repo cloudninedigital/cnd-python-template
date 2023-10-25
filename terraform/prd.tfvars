@@ -1,2 +1,2 @@
-application_name = "project_name"
+application_name = "project-name"
 project          = "changeme"
