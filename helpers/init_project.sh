@@ -318,6 +318,9 @@ if [[ $commit_changes == "y" ]]; then
   if [[ $(git branch --show-current) == "main" ]]; then
     read -p "You are on the main branch. Do you wish to create a new branch? (y/n) " create_branch
     if [[ $create_branch == "y" ]]; then
+      echo "We are going to create a new branch here, please follow our naming conventions."
+      echo "The branch name should start with 'feature-' or 'fix-' followed by a short description of the changes."
+      echo "Link to our guidelines: https://wiki.cloudninedigital.nl/en/Processing-and-Delivery/Software-Development/Git/Git_Best_Practices"
       read -p "Enter the name of the new branch: " branch_name
       git checkout -b $branch_name
     fi
