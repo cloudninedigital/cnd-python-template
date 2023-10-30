@@ -127,7 +127,7 @@ See below for a few more details on both parts:
 
 ## 6.1 Terraform configuration
 
-The Terraform configuration is part of the actual infrastructure you will deploy in Google Cloud. Things like Cloud functions, cloud run deployments, service accounts, user rights, pubsub topics and subscriptions and even BigQuery datasets and tables are part of this. Please see more detailed information in [Terraform templates usage](terraform_usage.md).
+The Terraform configuration is part of the actual infrastructure you will deploy in Google Cloud. Things like Cloud functions, cloud run deployments, service accounts, user rights, pubsub topics and subscriptions and even BigQuery datasets and tables are part of this. 
 
 ### using modules
 There a few examples of deployments of Cloud Functions present in the folder
@@ -136,11 +136,26 @@ There a few examples of deployments of Cloud Functions present in the folder
 This will provide you with a starting point for the configuration you are trying to achieve. Please read the documentation of 
 each one of these modules before you use them, to avoid surprises in your development process.
 
-
+Please see more detailed information about the modules in [Terraform templates usage](terraform_usage.md).
 
 ### Working with workspaces (staged environments)
 
+Terraform Workspaces are what we use to make sure we can change code in development phases (development, staging, production). A workspace is practically a separate state-file that manages a certain amount of resources, which means that for every development phase, resources are being managed separately. 
 
+Workspaces have different implications for different type of deployments. For most deployments the most important thing is to use the ${terraform.workspace} variable in any kind of application specific name being used, so that terraform knows it should deploy a different version (dev, stg, prd) of a certain resource. In most modules `main_trigger` this is already shown in terms of how you should add the workspace, but be aware that this is a necessary thing, and that Terraform will fail if you forget to deploy resources with a separate name per development stage (because it cannot create the same resource twice in most cases)
+
+Specifically for the BigQuery executor, there is more to the story than just incorporating the workspaces names. Here, it is also important to include every table name that you do not wish to touch in a development phase in the configuration json file (this is all perfectly explained in the documentation of the bigquery executor). 
+
+### Shared workspace
+
+For anything that shouldn't be duplicated per development stage, there is the 'shared' workspace. This is a separate folder also in the etl-template (see terraform/shared/) which uses the same state bucket, but has a different workspace in which these resources can be deployed only once. For now, the deployment of shared resources are only done manually. 
+
+Examples of resources that need to be independant of development phases: 
+* datasets and tables in BigQuery
+* Static IP addresses
+* possible things in the future we come up with
+
+For any deployment, you can fill the shared.tfvars file and= use the simple deploy.sh to make sure you deploy through the shared workspace. 
 
 ### extended development
 
