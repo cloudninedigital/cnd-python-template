@@ -127,19 +127,30 @@ See below for a few more details on both parts:
 
 ## 6.1 Terraform configuration
 
+The Terraform configuration is part of the actual infrastructure you will deploy in Google Cloud. Things like Cloud functions, cloud run deployments, service accounts, user rights, pubsub topics and subscriptions and even BigQuery datasets and tables are part of this. Please see more detailed information in [Terraform templates usage](terraform_usage.md).
+
+### using modules
 There a few examples of deployments of Cloud Functions present in the folder
 `terraform/modules/main_triggers`. From one of these files, you can copy the contents and paste it onto your `terraform/main.tf`.
 
 This will provide you with a starting point for the configuration you are trying to achieve. Please read the documentation of 
 each one of these modules before you use them, to avoid surprises in your development process.
 
-Please see more detailed information in [Terraform templates usage](terraform_usage.md).
+
+
+### Working with workspaces (staged environments)
+
+
+
+### extended development
 
 To extend your Terraform configuration, you will have to start dwelling into un-templated territory :relaxed:.
 Please follow a few [Getting Started with Google Cloud in Terraform](https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started)
 tutorials to get acquainted with the system.
 
-### 6.2 Python code
+As a general rule, please not that we try to incorporate as much as possible in re-usable chunks of modules. This means that if you create something that could be reused in another situation, please create / append to a module in Terraform so that a future project can benefit from your work!
+
+## 6.2 Python code
 To start development, you will have to understand which service in Google Cloud is your code
 going to be deployed. To see how you can start coding your entry points, check the relevant folders:
 * For Cloud Functions, please the following entrypoints in `project_name/gcp.py`
