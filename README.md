@@ -9,6 +9,14 @@ Functions and Terraform as a deployment system.
 
 # How use the ETL template
 
+## 0. Local environment setup
+Before starting this flow, please make sure that you have your environment locally setup properly to be able to go through the steps described:
+
+* A functioning WSL (Windows Subsystem Linux) Ubuntu environment
+* Pycharm installed and opened through WSL
+
+If you don't have these ready in your system, talk to a senior+ consultant to get this up and running (currently, we don't have a wiki page yet explaining the process). 
+
 ## 1. Starting a new repository from this template
 
 > **DO NOT FORK** this is meant to be used from **[Use this template](https://github.com/cloudninedigital/cnd-etl-template/generate)** feature.
@@ -17,12 +25,14 @@ Functions and Terraform as a deployment system.
 2. Give a name to your project. See [naming conventions](https://github.com/cloudninedigital)
 3. Wait until the first run of CI (Continuous Integration) finishes  
    (Github Actions will process the template and commit to your new repo)
-4. Then clone your new project and happy coding!
+4. Then you're ready to advance to step 2. 
 
 ## 2. Clone your project
 
-Follow [these instructions](https://wiki.cloudninedigital.nl/en/Processing-and-Delivery/Software-Development/Git/Getting-started-with-Git#cloning-an-existing-repository-from-a-remote-repository) 
-to clone a repository created on Github.
+There are multiple ways to clone a project. You can either use your IDE (Pycharm), use a specific GIT tool (like Github Desktop) or
+Follow [these instructions](https://wiki.cloudninedigital.nl/en/Processing-and-Delivery/Software-Development/Git/Getting-started-with-Git#cloning-an-existing-repository-from-a-remote-repository) to clone a repository created on Github from command line.
+
+Ultimately, though, once you've cloned the project, you have a local version of the project on your laptop that you can use for further steps.
 
 ## 3. Install Terraform, Cloud SDK CLI and GitHub CLI
 
@@ -38,11 +48,11 @@ Google Cloud resources. In this particular case, we use it to enable authenticat
 In this particular case, we use it to enable authentication of Terraform in our CI/CD pipelines.
 
 Before continuing please take the following steps: 
-* [Install](https://cloud.google.com/sdk/docs/install) and 
+* [Install](https://cloud.google.com/sdk/docs/install#deb) and 
 [initialize](https://cloud.google.com/sdk/docs/initializing) your Google Cloud CLI. Make sure to authenticate
 into the right Google Cloud project ID while initializing. 
-* [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/install-cli?in=terraform%2Fgcp-get-started).
-* [Install GitHub CLI](https://cli.github.com/).
+* [Install Terraform](https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/install-cli?in=terraform%2Fgcp-get-started). Choose the linux > Ubuntu option for installing, and execute the steps in your WSL ubuntu command line. 
+* [Install GitHub CLI](https://github.com/cli/cli/blob/trunk/docs/install_linux.md).
 
 The configuration files for Terraform can be found in the `terraform/` folder.
 
@@ -53,6 +63,11 @@ Run the following command to initialize your project:
 ```bash
 $ ./helpers/init_project.sh
 ```
+> Note: If you run into an error message that looks like `env: bash\r: No such file or directory`, this means that you've configured GIT to use Windows line endings, which cannot be interpreted properly by Linux terminals. To fix this, you can execute
+```
+$ git config --global core.autocrlf false
+```
+in your command line, remove, and reclone your repository. 
 
 > Note: The script will help you check the status of installation of the necessary tools.
 > It will not install them for you, but if they are installed they will be used.
@@ -137,8 +152,6 @@ section.
 
 > :exclamation: For now there are not pre-made templates for Cloud Run or other services in Google Cloud. This guide is supposed to be
 expanded with more examples as we go forward and explore more Cloud services for ETL/ELT processes.
-
-
 
 
 > **NOTE**: **WAIT** until first CI run on github actions before cloning your new project.
