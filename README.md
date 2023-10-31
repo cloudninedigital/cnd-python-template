@@ -63,7 +63,7 @@ Run the following command to initialize your project:
 ```bash
 $ ./helpers/init_project.sh
 ```
-> Note: If you run into an error message that looks like `env: bash\r: No such file or directory`, this means that you've configured GIT to use Windows line endings, which cannot be interpreted properly by Linux terminals. To fix this, you can execute
+> Note: Should you run into an error message that looks like `env: bash\r: No such file or directory`, this means that you've configured GIT to use Windows line endings, which cannot be interpreted properly by Linux terminals. This will probably only happen if you clone your repository through another tool than the WSL. To fix this, you can execute
 ```
 $ git config --global core.autocrlf false
 ```
@@ -142,9 +142,31 @@ Please see more detailed information about the modules in [Terraform templates u
 
 Terraform Workspaces are what we use to make sure we can change code in development phases (development, staging, production). A workspace is practically a separate state-file that manages a certain amount of resources, which means that for every development phase, resources are being managed separately. 
 
-Workspaces have different implications for different type of deployments. For most deployments the most important thing is to use the ${terraform.workspace} variable in any kind of application specific name being used, so that terraform knows it should deploy a different version (dev, stg, prd) of a certain resource. In most modules `main_trigger` this is already shown in terms of how you should add the workspace, but be aware that this is a necessary thing, and that Terraform will fail if you forget to deploy resources with a separate name per development stage (because it cannot create the same resource twice in most cases)
+Workspaces have different implications for different type of deployments. For most deployments the most important thing is to use the ${terraform.workspace} variable in any kind of application specific name being used, so that terraform knows it should deploy a different version (dev, stg, prd) of a certain resource. In most modules `main_trigger` this is already shown in terms of how you should add the workspace, but be aware that this is a necessary thing, and that Terraform will fail if you forget to deploy resources with a separate name per development stage (because it cannot create the same resource twice in most cases). An example usage of the terraform workspace in a module implementation is below: 
 
-Specifically for the BigQuery executor, there is more to the story than just incorporating the workspaces names. Here, it is also important to include every table name that you do not wish to touch in a development phase in the configuration json file (this is all perfectly explained in the documentation of the bigquery executor). 
+``` terraform
+module "cf_http_trigger_bq_processing" {
+  source      = "./modules/gf_gen2_http_trigger_source_repo"
+  name        = "bigquery_http_function-${terraform.workspace}"
+  description = <<EOF
+This function will trigger one or multiple bigquery script based upon BigQuery Executor logic
+EOF
+  project     = var.project
+  entry_point = "main_bigquery_http_event"
+  environment = {
+    PROJECT           = var.project
+    GCS_PROJECT       = var.project
+    GCS_BUCKET_NAME   = "${var.application_name}-bqexecutor-sync-${terraform.workspace}"
+    INCLUDE_VARIABLES = "true"
+    SHOW_ALL_ROWS     = "false"
+    ON_ERROR_CONTINUE = "false"
+    EXCLUDE_TEMP_IDS  = "false"
+    ENVIRONMENT        = terraform.workspace
+  }
+}
+```
+
+Specifically for the BigQuery executor, there is more to the story than just incorporating the workspaces names. Here, it is also important to include every table name that you do not wish to touch in a development phase in the configuration json file (this is all perfectly explained in the documentation of the [BigQuery executor](https://github.com/cloudninedigital/cnd-tools/blob/main/cnd_tools/database/bigquery_executor/README.md) ). 
 
 ### Shared workspace
 
@@ -156,6 +178,24 @@ Examples of resources that need to be independant of development phases:
 * possible things in the future we come up with
 
 For any deployment, you can fill the shared.tfvars file and= use the simple deploy.sh to make sure you deploy through the shared workspace. 
+
+Should you need to use the information from the shared workspace in the normal dev/stg/prd workspaces, you can gather the information with a data block referencing the 'shared' workspace specifically, like in below example: 
+
+``` terraform
+data "terraform_remote_state" "gcs" {
+  backend = "gcs"
+  workspace = "shared"
+
+  config = {
+    bucket = "ext_santander_gcp-jostsantanderblx-tfstate"
+    prefix = "terraform/state"
+  }
+}
+
+output "vpc_connector" {
+  value = data.terraform_remote_state.gcs.outputs.vpc_connector
+}
+```
 
 ### extended development
 
