@@ -62,8 +62,22 @@ variable "timeout" {
   default     = 540
 }
 
+variable "vpc_connector" {
+  description = "The name of the vpc connector needed (only relevant if a static IP is needed)"
+  type        = string
+  default     = ""
+}
+
 variable "alert_on_failure" {
   description = "The schedule on which to trigger the function."
   type        = bool
   default     = false
+}
+
+variable "alert_email_addresses" {
+  description = "email addresses to send notifications to"
+  type = map(string)
+  default = {
+    cnd_alerts = "alerting@cloudninedigital.nl"
+  }
 }

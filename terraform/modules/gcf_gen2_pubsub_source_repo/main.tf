@@ -140,6 +140,8 @@ resource "google_cloudfunctions2_function" "function" {
     timeout_seconds                = var.timeout
     environment_variables          = var.environment
     ingress_settings               = "ALLOW_INTERNAL_ONLY"
+    vpc_connector                  = var.vpc_connector
+    vpc_connector_egress_settings  = var.vpc_connector == "" ? "" : "ALL_TRAFFIC"
     all_traffic_on_latest_revision = true
   }
 
@@ -164,4 +166,6 @@ module "alerting_policy" {
   count = var.alert_on_failure ? 1 : 0
   name = "${var.name}-alert-policy"
   filter = "resource.type=\"cloud_function\" severity=ERROR resource.labels.function_name=\"${var.name}\""
+  documentation = "The function ${google_cloudfunctions2_function.function.name} failed. Please check the logs for more information."
+  email_addresses = var.alert_email_addresses
 }
