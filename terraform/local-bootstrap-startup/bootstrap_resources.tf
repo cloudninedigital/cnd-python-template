@@ -1,7 +1,9 @@
 locals {
   bootstrap_services = {
     cloudbuild = "cloudbuild.googleapis.com",
-    cloudresourcemanager = "cloudresourcemanager.googleapis.com"
+    cloudresourcemanager = "cloudresourcemanager.googleapis.com",
+    iam = "iam.googleapis.com",
+    serviceusage = "serviceusage.googleapis.com"
   }
   terraform_permissions = {
     editor = "roles/editor",
@@ -11,6 +13,7 @@ locals {
 
 resource "google_project_service" "services" {
   for_each = local.bootstrap_services
+  project  = var.project
   provider           = google-beta
   service            = each.value
   disable_on_destroy = false
