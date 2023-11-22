@@ -57,17 +57,15 @@ resource "google_pubsub_topic" "topic" {
 data "google_project" "project" {}
 
 resource "google_service_account" "account" {
-  account_id   = "${var.name}-service-account"
+  account_id   = "${replace(var.name, "_", "-")}-sa"
   display_name = "Test Service Account - used for both the cloud function and eventarc trigger in the test"
-
-  depends_on = [google_project_service.iam]
 }
 
 resource "google_project_iam_member" "secret_manager_access" {
   project = var.project
   role    = "roles/secretmanager.secretAccessor"
   member  = "serviceAccount:${google_service_account.account.email}"
-  depends_on = [google_service_account.account.email]
+  depends_on = [google_service_account.account]
 }
 
 resource "google_project_iam_member" "token_creator_access" {
@@ -82,7 +80,7 @@ resource "google_project_iam_member" "token_creator_access_ce" {
   project = var.project
   role    = "roles/iam.serviceAccountTokenCreator"
   member  = "serviceAccount:${google_service_account.account.email}"
-  depends_on = [google_service_account.account.email]
+  depends_on = [google_service_account.account]
 }
 
 resource "google_project_iam_member" "run_invoker_access" {
@@ -104,21 +102,21 @@ resource "google_project_iam_member" "dataEditor" {
   project    = var.project
   role       = "roles/bigquery.dataEditor"
   member     = "serviceAccount:${google_service_account.account.email}"
-  depends_on = [google_service_account.account.email]
+  depends_on = [google_service_account.account]
 }
 
 resource "google_project_iam_member" "jobUser" {
   project    = var.project
   role       = "roles/bigquery.jobUser"
   member     = "serviceAccount:${google_service_account.account.email}"
-  depends_on = [google_service_account.account.email]
+  depends_on = [google_service_account.account]
 }
 
 resource "google_project_iam_member" "objectViewer" {
   project    = var.project
   role       = "roles/storage.objectViewer"
   member     = "serviceAccount:${google_service_account.account.email}"
-  depends_on = [google_service_account.account.email]
+  depends_on = [google_service_account.account]
 }
 
 resource "google_cloud_scheduler_job" "job" {
@@ -145,6 +143,7 @@ module "source_code" {
   source   = "../gcs_source"
   project  = var.project
   app_name = var.name
+  source_folder_relative_path = var.source_folder_relative_path
 }
 
 
@@ -177,6 +176,7 @@ resource "google_cloudfunctions2_function" "function" {
       WRITE_PROJECT=var.write_project
       WRITE_DATASET=var.write_dataset
       WRITE_TABLE=var.write_table
+      CONFIGURATION_FILE_NAME=var.configuration_file_name
     }
     ingress_settings               = "ALLOW_INTERNAL_ONLY"
     all_traffic_on_latest_revision = true
@@ -203,7 +203,7 @@ resource "google_cloudfunctions2_function" "function" {
 module "alerting_policy" {
   source = "../alert_policy"
   count = var.alert_on_failure ? 1 : 0
-  name = "${var.name}-alert-policy"
+  name = "${replace(var.name, "_", "-")}-alert-policy"
   filter = "resource.type=\"cloud_function\" severity=ERROR resource.labels.function_name=\"${var.name}\""
 }
 
@@ -211,8 +211,8 @@ module "alerting_policy" {
 module "check_alerting_policy" {
   source = "../alert_policy"
   count = var.alert_on_failure ? 1 : 0
-  name = "${var.name}-check-alert-policy"
-  filter = "resource.type=\"cloud_function\" textPayload:\"~Data Quality Checker mismatches~\" resource.labels.function_name=\"${var.name}\""
+  name = "${replace(var.name, "_", "-")}-check-alert-policy"
+  filter = "resource.type=\"cloud_run_revision\" textPayload:\"~Data Quality Checker mismatches~\" resource.labels.service_name=\"${replace(var.name, "_", "-")}-function\""
   documentation = <<EOT
     # data quality check job contained mismatches
     This policy is to alert when bq-executor job fails.
@@ -222,7 +222,7 @@ module "check_alerting_policy" {
     $${log.extracted_labels.mismatches}
     EOT
   label_extractors = {
-    mismatches = "EXTRACT(protoPayload.metadata.jobChange.job.jobStatus.errorResult.message)"
+    mismatches = "EXTRACT(textPayload)"
   }
   
 }

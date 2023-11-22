@@ -1,50 +1,10 @@
 {"tables": {
-    "dataset.table1": {
-      "primary_columns": ["hoi", "hee"],
-         "expected_values": {
-              "column1": ["value1", "value2"],
-                "column2": ["value3", "value4"]
-          },
-        "expected_patterns": {
-            "column3": "^\\d{8}$",
-          "column4": ".*\\_companyname"
-        },
-      "present_dates": {"present_dates_column": "report_date",
-                        "lookback_window_days": 30},
-      "custom_queries": {
-        "example1": "SELECT true from dataset.table1"
-      }
+  "pvh_adobe_configuration.evars_current_with_changes": {
+    "primary_columns": ["id", "report_suite"],
+    "expected_patterns": {
+      "id": "^evar\\d{1,3}$"
     },
-    "dataset.table2": {
-      "primary_columns": ["hoi", "howdy"],
-      "expected_values": {
-              "column1": ["value1", "value2"],
-                "column2": ["value3", "value4"]
-          },
-      "null_values": ["col1", "col2"],
-      "check_present_dates": false
-    },
-    "dataset.table3": {
-      "primary_columns": ["hoi"],
-        "expected_patterns": {
-            "column3": "^\\d{8}$",
-          "column4": ".*\\_companyname"
-        },
-      "check_present_dates": true,
-      "present_dates_column": "report_date"
-    },
-    
-    "dataset.table4": {
-         "expected_values": {
-              "column1": ["value1", "value2"],
-                "column2": ["value3", "value4"]
-          },
-        "expected_patterns": {
-            "column3": "^\\d{8}$",
-          "column4": ".*\\_companyname"
-        },
-      "check_present_dates": true,
-      "present_dates_column": "report_date"
-    }
-  
-  }}
+    "expected_values": {"type": ["text_string"]},
+    "null_values": ["id"]
+}}
+}

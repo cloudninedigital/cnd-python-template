@@ -67,3 +67,9 @@ variable "alert_on_failure" {
   type        = bool
   default     = false
 }
+
+variable "source_folder_relative_path" {
+  description = "relative path to cloud function code"
+  type        = string
+  default = ".."
+}

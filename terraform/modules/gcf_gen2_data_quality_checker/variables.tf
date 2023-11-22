@@ -28,6 +28,13 @@ variable "write_table" {
   type        = string
 }
 
+variable "configuration_file_name" {
+  description = "name of configuration_file"
+  type        = string
+  default     = "configuration.json"
+}
+
+
 variable "region" {
   description = "Region where function is living."
   default     = "europe-west1"
@@ -109,4 +116,10 @@ variable "alert_on_failure" {
   description = "The schedule on which to trigger the function."
   type        = bool
   default     = false
+}
+
+variable "source_folder_relative_path" {
+  description = "relative path to cloud function code"
+  type        = string
+  default = "../project_name/data_quality"
 }

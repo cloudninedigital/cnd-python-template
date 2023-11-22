@@ -77,6 +77,7 @@ module "source_code" {
   source   = "../gcs_source"
   project  = var.project
   app_name = var.name
+  source_folder_relative_path = var.source_folder_relative_path
 }
 
 data "google_project" "project" {}
