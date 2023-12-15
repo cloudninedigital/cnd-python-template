@@ -83,6 +83,18 @@ variable "instantiate_scheduler" {
   type        = bool
   default     = true
 }
+  
+variable "source_folder_relative_path" {
+  description = "relative path to cloud function code"
+  type        = string
+  default = ".."
+}
+
+variable "vpc_connector" {
+  description = "The name of the vpc connector needed (only relevant if a static IP is needed)"
+  type        = string
+  default     = ""
+}
 
 variable "alert_on_failure" {
   description = "The schedule on which to trigger the function."
@@ -90,8 +102,10 @@ variable "alert_on_failure" {
   default     = false
 }
 
-variable "source_folder_relative_path" {
-  description = "relative path to cloud function code"
-  type        = string
-  default = ".."
+variable "alert_email_addresses" {
+  description = "email addresses to send notifications to"
+  type = map(string)
+  default = {
+    cnd_alerts = "alerting@cloudninedigital.nl"
+  }
 }

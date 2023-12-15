@@ -6,6 +6,7 @@
             "call": "http.post",
             "args": {
                 "url": "https://${region}-${project}.cloudfunctions.net/${cf.name}",
+                "timeout": 1800.0,
                 %{if (trigger_type == "bq" || trigger_type == "gcs") && index == 0}
                 "body": { 
                     "cf_event": "$${event}" 
