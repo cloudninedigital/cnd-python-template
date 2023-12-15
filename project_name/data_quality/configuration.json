@@ -1,0 +1,10 @@
+{"tables": {
+  "pvh_adobe_configuration.evars_current_with_changes": {
+    "primary_columns": ["id", "report_suite"],
+    "expected_patterns": {
+      "id": "^evar\\d{1,3}$"
+    },
+    "expected_values": {"type": ["text_string"]},
+    "null_values": ["id"]
+}}
+}

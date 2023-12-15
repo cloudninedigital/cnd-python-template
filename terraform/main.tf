@@ -9,26 +9,6 @@
 #   gcs_local_source_path = "../project_name/SQL/sql_scripts"
 # }
 
-# module "cf_http_trigger_bq_processing" {
-#   source      = "./modules/gf_gen2_http_trigger_source_repo"
-#   name        = "bigquery_http_function"
-#   description = <<EOF
-# This function will trigger one or multiple bigquery script based upon BigQuery Executor logic
-# EOF
-#   project     = var.project
-#   entry_point = "main_bigquery_http_event"
-#   environment = {
-#     PROJECT           = var.project
-#     GCS_PROJECT       = var.project
-#     GCS_BUCKET_NAME   = "${var.application_name}-bqexecutor-sync"
-#     INCLUDE_VARIABLES = "false"
-#     SHOW_ALL_ROWS     = "false"
-#     ON_ERROR_CONTINUE = "false"
-#     EXCLUDE_TEMP_IDS  = "false"
-#     ENVIROMENT        = terraform.workspace
-#   }
-# }
-
 # module "workflows_cf_main_trigger" {
 #   source = "./modules/workflows_cf"
 #   name = "workflows-cf-bigquery-test-${terraform.workspace}"
