@@ -31,6 +31,18 @@ variable "cloudfunctions" {
   default     = [{name: "example_cf", table_updated: "some_dataset.iets"}]
 }
 
+variable "dataform_pipelines" {
+  description = "list of dataform pipeline maps to execute in the flow"
+  type        = list
+  default     = [{name: "example_dp", tag: "example_tag", repository: "dataform_repo_example"}]
+}
+
+variable "workflow_type" {
+  description= "type of workflow to be triggered (determines the template being used). options are 'cf' (for cloud_functions) and 'dataform'"
+  type = string
+  default = "cf"
+}
+
 variable trigger_type {
   description = "Type of trigger used to start workflow. Available options: http, schedule, gcs, bq"
   type = string
@@ -45,6 +57,12 @@ variable "region" {
 
 variable "functions_region" {
   description = "Region where Cloud functions are deployed."
+  type = string
+  default     = "europe-west3"
+}
+
+variable "dataform_region" {
+  description = "Region where dataform is deployed."
   type = string
   default     = "europe-west3"
 }

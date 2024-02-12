@@ -7,6 +7,7 @@ locals {
     "roles/cloudfunctions.invoker",
     "roles/run.invoker",
     "roles/storage.admin",
+    "roles/dataform.editor"
   ]
 }
 
@@ -125,7 +126,12 @@ resource "google_workflows_workflow" "workflows_instance" {
   description     = var.description
   service_account = google_service_account.workflows_service_account.email
   # Imported main workflow template file
-  source_contents = templatefile("modules/workflows_cf/workflow_templates/workflows_template.tftpl", {
+  source_contents = var.workflow_type == "dataform" ? templatefile("modules/workflows/workflow_templates/workflows_dataform_template.tftpl", {
+    project        = var.project,
+    region         = var.dataform_region,
+    dataform_pipelines = var.dataform_pipelines,
+    trigger_type   = var.trigger_type
+  }):  templatefile("modules/workflows/workflow_templates/workflows_cf_template.tftpl", {
     project        = var.project,
     region         = var.functions_region,
     cloudfunctions = var.cloudfunctions,
@@ -262,6 +268,7 @@ resource "google_cloud_scheduler_job" "workflow" {
   google_project_service.cloudscheduler]
 }
 
+### END schedule TRIGGER SPECIFIC PART
 
 module "bq_executor_alerting_policy" {
   source = "../bq_executor_alert_policy"
@@ -278,4 +285,12 @@ module "alerting_policy" {
   filter = "resource.type=\"workflows.googleapis.com/Workflow\" severity=ERROR resource.labels.workflow_id=\"${var.name}\""
   email_addresses = var.alert_email_addresses
 }
-### END schedule TRIGGER SPECIFIC PART
+
+# TODO: figure out how to make this policy unique per workflow (or just decide to deploy separately always)
+# module "alerting_policy" {
+#   source = "../alert_policy"
+#   count  = ((var.workflow_type == "dataform") && var.alert_on_failure) ? 1 : 0
+#   name   = "${var.name}-df-alert-policy"
+#   filter = "resource.type=\"dataform.googleapis.com/Repository\" severity=ERROR"
+#   email_addresses = var.alert_email_addresses
+# }
