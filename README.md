@@ -129,12 +129,12 @@ See below for a few more details on both parts:
 
 The Terraform configuration is part of the actual infrastructure you will deploy in Google Cloud. Things like Cloud functions, cloud run deployments, service accounts, user rights, pubsub topics and subscriptions and even BigQuery datasets and tables are part of this. 
 
-### using modules
+### Using modules
 There a few examples of deployments of Cloud Functions present in the folder
 `terraform/modules/main_triggers`. From one of these files, you can copy the contents and paste it onto your `terraform/main.tf`.
 
 This will provide you with a starting point for the configuration you are trying to achieve. Please read the documentation of 
-each one of these modules before you use them, to avoid surprises in your development process.
+each one of these modules before you use them, to avoid surprises in your development process. **Note:** The improved ETL template makes use of the CND Terraform repository as a source to gather information about all the repositories. More information about the usage can be found in the [Terraform templates usage](terraform_usage.md).
 
 Please see more detailed information about the modules in [Terraform templates usage](terraform_usage.md).
 

@@ -12,7 +12,9 @@ source_repo_name = "Google Cloud source repo name (CHANGE ME, no spaces)"
 Review all the values so that they make sense for your project, application and repo hosting.
 
 > **Note** This already assumes that your link between the GitHub repo and Google Cloud Source is established.
-> If that is not the case please visit [Link GitHub repo into a Google Cloud Source repo](./README.md#52-link-github-repo-into-a-google-cloud-source-repo)
+> If that is not the case please visit [Link GitHub repo into a Google Cloud Source repo](./README.md#52-link-github-repo-into-a-google-cloud-source-repo).
+
+> **IMPORTANT:** The modules currently can be found within the [CND Terraform repository on GitHub](https://github.com/cloudninedigital/cnd-terraform). For more information on extracting a module from GitHub, please visit the [Terraform documentation on module sources](https://developer.hashicorp.com/terraform/language/modules/sources#github). You can also find guidance on [selecting a module's revision](https://developer.hashicorp.com/terraform/language/modules/sources#selecting-a-revision) and [working with subdirectories](https://developer.hashicorp.com/terraform/language/modules/sources#selecting-a-revision).
 
 # Choosing and configuring your Terraform configuration
 
