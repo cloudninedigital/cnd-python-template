@@ -1,12 +1,12 @@
 module "gcs_folder_sync" {
-  source                = "./modules/gcs_folder_sync"
+  source                = "github.com/cloudninedigital/cnd-terraform//gcs_folder_sync"
   name                  = "${var.application_name}-bqexecutor-sync-${terraform.workspace}"
   gcs_bucket_file_path  = ""
   gcs_local_source_path = "../project_name/SQL/sql_scripts"
 }
 
 module "cf_http_trigger_bq_processing" {
-  source      = "./modules/gf_gen2_http_trigger_source_repo"
+  source      = "github.com/cloudninedigital/cnd-terraform//gf_gen2_http_trigger_source_repo"
   name        = "${var.application_name}-bqexecutor-${terraform.workspace}"
   description = <<EOF
 This function will trigger one or multiple bigquery script based upon BigQuery Executor logic
@@ -23,7 +23,7 @@ EOF
 }
 
 module "workflows_cf_main_trigger" {
-  source = "./modules/workflows_cf"
+  source = "github.com/cloudninedigital/cnd-terraform//workflows_cf"
   name = "${var.application_name}-workflow-${terraform.workspace}"
   description = "a workflow triggered by a table update that calls the bigquery_http_function"
   project = var.project

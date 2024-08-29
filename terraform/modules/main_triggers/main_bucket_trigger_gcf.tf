@@ -9,7 +9,7 @@ resource "google_storage_bucket" "landing_bucket" {
 
 
 module "cf_gcs_to_bq" {
-  source           = "./modules/gf_gen1_bucket_trigger_source_repo"
+  source           = "github.com/cloudninedigital/cnd-terraform//gf_gen2_bucket_trigger_gcs_source"
   name             = "${var.application_name}-${terraform.workspace}"
   description      = <<EOF
 This function will trigger on new files saved in the trigger bucket

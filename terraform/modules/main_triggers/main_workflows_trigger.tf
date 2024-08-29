@@ -1,5 +1,5 @@
 module "workflows_cf_main_trigger" {
-  source = "./modules/workflows"
+  source = "github.com/cloudninedigital/cnd-terraform//workflows"
   name = "workflows-dataform-test"
   description = "a workflow triggered by a table update that calls the bigquery_http_function"
   project = "cloudnine-digital"

@@ -1,5 +1,5 @@
 module "sgtm_cloud_run" {
-  source = "./modules/sgtm_cloud_run"
+  source = "github.com/cloudninedigital/cnd-terraform//sgtm_cloud_run"
   tagging_server_name = "<tagging_server_name>"
   preview_server_name = "<preview_server_name>"
   project = var.project

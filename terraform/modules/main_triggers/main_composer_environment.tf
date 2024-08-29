@@ -6,7 +6,7 @@
 # }
 
 module "composer_environment" {
-  source  = "./modules/composer_environment"
+  source  = "github.com/cloudninedigital/cnd-terraform//composer_environment"
   name    = "fillinyourname-${terraform.workspace}"
   project = var.project
 }

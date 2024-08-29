@@ -1,5 +1,5 @@
 module "cgf_bigquery" {
-  source      = "./modules/gf_gen2_bigquery_trigger_source_repo"
+  source      = "github.com/cloudninedigital/cnd-terraform//gf_gen2_bigquery_trigger_source_repo"
   name        = "${var.application_name}-${terraform.workspace}"
   description = <<EOF
   This function will trigger when a bigquery table create or delete has happened
@@ -20,7 +20,7 @@ EOF
 }
 
 module "gcs_sync" {
-  source                = "./modules/gcs_folder_sync"
+  source                = "github.com/cloudninedigital/cnd-terraform//gcs_folder_sync"
   bucket                = "${var.bucket}-${terraform.workspace}"
   gcs_bucket_file_path  = ""
   gcs_local_source_path = "../project_name/SQL/sql_scripts"

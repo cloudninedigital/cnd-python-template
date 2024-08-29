@@ -1,5 +1,5 @@
 module "static_egress_ip" {
-    source = "../modules/static_egress_ip"
+    source = "github.com/cloudninedigital/cnd-terraform//static_egress_ip"
     name = "sftp-access"
     project = var.project
     region = var.region

@@ -1,5 +1,5 @@
 module "bigquery_some_dataset" {
-  source      = "./modules/bq_dataset"
+  source      = "github.com/cloudninedigital/cnd-terraform//bq_dataset"
   dataset_id = "some_dataset"
   friendly_name = "Some Dataset"
   description = "Some Dataset"

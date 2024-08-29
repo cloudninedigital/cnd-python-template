@@ -1,5 +1,5 @@
 module "cf_data_quality_checker" {
-  source      = "./modules/gcf_gen2_data_quality_checker"
+  source      = "github.com/cloudninedigital/cnd-terraform//gf_gen2_data_quality_checker"
   name        = "dq_checker"
   schedule = "1 2 * * *"
   configuration_file_name = "configuration.json"

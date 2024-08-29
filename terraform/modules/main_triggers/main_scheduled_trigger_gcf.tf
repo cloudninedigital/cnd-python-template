@@ -1,5 +1,5 @@
 module "cgf_pubsub" {
-  source             = "./modules/gcf_gen2_pubsub_source_repo"
+  source             = "github.com/cloudninedigital/cnd-terraform//gf_gen2_pubsub_source_repo"
   name               = "${var.application_name}-${terraform.workspace}"
   description        = <<EOF
   This function will trigger when a new pubsub message is published.
